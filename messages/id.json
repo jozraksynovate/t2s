@@ -11,7 +11,7 @@
     "platform": "Platform"
   },
   "NavUser": {
-    "upgrade": "Upgrade ke Pro",
+    "upgrade": "Tingkatkan ke Pro",
     "account": "Akun",
     "theme": "Tema",
     "themeLight": "Terang",
@@ -29,5 +29,38 @@
     "home": "Beranda | T2S",
     "studio": "Studio | T2S",
     "billing": "Tagihan | T2S"
+  },
+  "ProjectItem": {
+    "share": "Bagikan",
+    "rename": "Ubah Nama",
+    "delete": "Hapus",
+    "menuTooltip": "Buka menu",
+    "shareSuccess": "Tautan disalin ke papan klip",
+    "shareTitle": "Bagikan Tautan",
+    "shareDescription": "Siapa pun yang memiliki tautan ini akan dapat melihat proyek ini.",
+    "copy": "Salin",
+    "close": "Tutup",
+    "cancel": "Batal",
+    "saveChanges": "Simpan perubahan",
+    "renameTitle": "Ubah Rincian Proyek",
+    "renameDescription": "Ubah rincian proyek Anda di sini. Klik simpan setelah selesai.",
+    "nameLabel": "Nama proyek",
+    "renameSuccess": "Nama proyek berhasil diubah menjadi \"{name}\"",
+    "renameError": "Gagal memperbarui nama proyek",
+    "deleteTitle": "Apakah Anda benar-benar yakin?",
+    "deleteDescription": "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus proyek \"{name}\" secara permanen.",
+    "deleteCancel": "Batal",
+    "deleteConfirm": "Hapus Proyek",
+    "deleteSuccess": "Proyek \"{name}\" berhasil dihapus",
+    "undo": "Urungkan"
+  },
+  "NewProject": {
+    "trigger": "Proyek Baru",
+    "title": "Buat Proyek Baru",
+    "description": "Beri nama proyek Anda untuk memulai. Klik buat setelah selesai.",
+    "nameLabel": "Nama proyek",
+    "namePlaceholder": "Proyek Keren Saya",
+    "create": "Buat Proyek",
+    "success": "Proyek \"{name}\" berhasil dibuat"
   }
 }

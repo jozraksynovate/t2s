@@ -29,5 +29,38 @@
     "home": "Home | T2S",
     "studio": "Studio | T2S",
     "billing": "Billing | T2S"
+  },
+  "ProjectItem": {
+    "share": "Share",
+    "rename": "Rename",
+    "delete": "Delete",
+    "menuTooltip": "Open menu",
+    "shareSuccess": "Link copied to clipboard",
+    "shareTitle": "Share Link",
+    "shareDescription": "Anyone who has this link will be able to view this project.",
+    "copy": "Copy",
+    "close": "Close",
+    "cancel": "Cancel",
+    "saveChanges": "Save changes",
+    "renameTitle": "Rename Project",
+    "renameDescription": "Make changes to your project details here. Click save when you're done.",
+    "nameLabel": "Project name",
+    "renameSuccess": "Project name updated to \"{name}\"",
+    "renameError": "Failed to update project name",
+    "deleteTitle": "Are you absolutely sure?",
+    "deleteDescription": "This action cannot be undone. This will permanently delete the project \"{name}\".",
+    "deleteCancel": "Cancel",
+    "deleteConfirm": "Delete Project",
+    "deleteSuccess": "Project \"{name}\" deleted",
+    "undo": "Undo"
+  },
+  "NewProject": {
+    "trigger": "New Project",
+    "title": "Create New Project",
+    "description": "Give your project a name to get started. Click create when you're done.",
+    "nameLabel": "Project name",
+    "namePlaceholder": "My Awesome Project",
+    "create": "Create Project",
+    "success": "Project \"{name}\" created"
   }
 }

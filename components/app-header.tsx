@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator"
 import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { NewProjectDialog } from "@/components/new-project-dialog"
 import React from "react"
 
 export function AppHeader() {
@@ -43,16 +44,42 @@ export function AppHeader() {
             <>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
+                {pathSegments.length > 2 ? (
+                  <BreadcrumbLink asChild>
+                    <Link href={`/${pathSegments[0]}/${pathSegments[1]}`}>
+                      {t.has(pathSegments[1]) 
+                        ? t(pathSegments[1]) 
+                        : pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1)}
+                    </Link>
+                  </BreadcrumbLink>
+                ) : (
+                  <BreadcrumbPage>
+                    {t.has(pathSegments[1]) 
+                      ? t(pathSegments[1]) 
+                      : pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1)}
+                  </BreadcrumbPage>
+                )}
+              </BreadcrumbItem>
+            </>
+          )}
+          {pathSegments.length > 2 && (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
                 <BreadcrumbPage>
-                  {t.has(pathSegments[1]) 
-                    ? t(pathSegments[1]) 
-                    : pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1)}
+                  {pathSegments[2]
+                    .split('-')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ')}
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </>
           )}
         </BreadcrumbList>
       </Breadcrumb>
+      <div className="ml-auto">
+        {pathname === "/app/studio" && <NewProjectDialog />}
+      </div>
     </header>
   )
 }

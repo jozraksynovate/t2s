@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { ProjectItem } from '@/components/project-item';
 
 export async function generateMetadata({
   params
@@ -24,11 +25,19 @@ export default async function StudioPage({
   return (
     <>
       <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div className="aspect-video rounded-xl bg-muted/50" />
-        <div className="aspect-video rounded-xl bg-muted/50" />
-        <div className="aspect-video rounded-xl bg-muted/50" />
+        <ProjectItem 
+          title="Project Alpha" 
+          description="A sophisticated text-to-speech project for commercial use." 
+        />
+        <ProjectItem 
+          title="Project Beta" 
+          description="Experimental voice synthesis with neural processing." 
+        />
+        <ProjectItem 
+          title="Project Gamma" 
+          description="Automated narration for digital publications and blogs." 
+        />
       </div>
-      <div className="min-h-screen flex-1 rounded-xl bg-muted/50 md:min-h-min" />
     </>
   )
 }
