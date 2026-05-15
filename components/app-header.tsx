@@ -92,7 +92,7 @@ export function AppHeader() {
         )}
         {pathSegments.length >= 3 && pathSegments[0] === "app" && pathSegments[1] === "studio" && (
           <>
-            <Button variant="outline">
+            <Button variant="ghost">
               {tStudio('docs')}
             </Button>
             <Button variant="outline">
