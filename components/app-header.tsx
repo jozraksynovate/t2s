@@ -12,15 +12,19 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
 import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { NewProjectDialog } from "@/components/new-project-dialog"
+import { useSearchParams } from "next/navigation"
 import React from "react"
 
 export function AppHeader() {
   const pathname = usePathname()
   const t = useTranslations('Navigation')
+  const tNew = useTranslations('NewProject')
+  const searchParams = useSearchParams()
+  const projectNameParam = searchParams.get('name')
   
   // With next-intl's usePathname, the locale is already stripped.
   // Example: /app/studio (even if the URL is /en/app/studio)
@@ -67,7 +71,7 @@ export function AppHeader() {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  {pathSegments[2]
+                  {projectNameParam || pathSegments[2]
                     .split('-')
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(' ')}
@@ -78,7 +82,14 @@ export function AppHeader() {
         </BreadcrumbList>
       </Breadcrumb>
       <div className="ml-auto">
-        {pathname === "/app/studio" && <NewProjectDialog />}
+        {pathname === "/app/studio" && (
+          <Button 
+            variant="default" 
+            onClick={() => window.dispatchEvent(new CustomEvent("open-new-project"))}
+          >
+            {tNew('trigger')}
+          </Button>
+        )}
       </div>
     </header>
   )

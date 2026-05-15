@@ -62,5 +62,14 @@
     "namePlaceholder": "My Awesome Project",
     "create": "Create Project",
     "success": "Project \"{name}\" created"
+  },
+  "CommandMenu": {
+    "navigation": "Navigation",
+    "actions": "Actions",
+    "account": "Account",
+    "projects": "Projects",
+    "newProject": "New Project",
+    "searchPlaceholder": "Type a command or search...",
+    "emptyResults": "No results found."
   }
 }

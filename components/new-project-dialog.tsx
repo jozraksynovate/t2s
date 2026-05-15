@@ -4,7 +4,6 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 
 import { useRouter } from "@/i18n/routing"
@@ -29,8 +28,21 @@ const projectSchema = z.object({
 
 type ProjectFormValues = z.infer<typeof projectSchema>
 
-export function NewProjectDialog() {
-  const [open, setOpen] = React.useState(false)
+interface NewProjectDialogProps {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  showTrigger?: boolean
+}
+
+export function NewProjectDialog({ 
+  open: controlledOpen, 
+  onOpenChange: controlledOnOpenChange,
+  showTrigger = true 
+}: NewProjectDialogProps) {
+  const [internalOpen, setInternalOpen] = React.useState(false)
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+  const setOpen = controlledOnOpenChange !== undefined ? controlledOnOpenChange : setInternalOpen
+  
   const router = useRouter()
   const t = useTranslations('NewProject')
   const tCommon = useTranslations('ProjectItem')
@@ -42,18 +54,29 @@ export function NewProjectDialog() {
     },
   })
 
+  // Listen for global event to open the dialog
+  React.useEffect(() => {
+    const handleOpen = () => {
+      setOpen(true)
+    }
+    window.addEventListener("open-new-project", handleOpen)
+    return () => window.removeEventListener("open-new-project", handleOpen)
+  }, [setOpen])
+
   const onSubmit = (values: ProjectFormValues) => {
     setOpen(false)
     const slug = values.name.toLowerCase().trim().replace(/\s+/g, '-')
-    router.push(`/app/studio/${slug}`)
+    router.push(`/app/studio/${slug}?name=${encodeURIComponent(values.name)}`)
     form.reset()
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="default">{t('trigger')}</Button>
-      </DialogTrigger>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          <Button variant="default">{t('trigger')}</Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-sm">
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
           <DialogHeader>

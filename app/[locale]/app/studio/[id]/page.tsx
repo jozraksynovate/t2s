@@ -1,15 +1,21 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { projects } from '@/lib/data';
 
 export async function generateMetadata({
-  params
+  params,
+  searchParams
 }: {
   params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<{ name?: string }>;
 }) {
   const { id } = await params;
-  const projectName = id
+  const { name } = await searchParams;
+  
+  const project = projects.find(p => p.id === id);
+  const projectName = name || (project ? project.title : id
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .join(' '));
 
   return {
     title: projectName

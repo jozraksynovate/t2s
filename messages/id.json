@@ -62,5 +62,14 @@
     "namePlaceholder": "Proyek Keren Saya",
     "create": "Buat Proyek",
     "success": "Proyek \"{name}\" berhasil dibuat"
+  },
+  "CommandMenu": {
+    "navigation": "Navigasi",
+    "actions": "Tindakan",
+    "account": "Akun",
+    "projects": "Proyek",
+    "newProject": "Proyek Baru",
+    "searchPlaceholder": "Ketik perintah atau cari...",
+    "emptyResults": "Hasil tidak ditemukan."
   }
 }
