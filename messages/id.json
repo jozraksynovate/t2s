@@ -1,0 +1,32 @@
+{
+  "HomePage": {
+    "title": "Selamat Datang di T2S",
+    "description": "Platform terbaik untuk kebutuhan Anda."
+  },
+  "Navigation": {
+    "home": "Beranda",
+    "studio": "Studio",
+    "billing": "Tagihan",
+    "settings": "Pengaturan"
+  },
+  "NavUser": {
+    "upgrade": "Upgrade ke Pro",
+    "account": "Akun",
+    "theme": "Tema",
+    "themeLight": "Terang",
+    "themeDark": "Gelap",
+    "themeSystem": "Sistem",
+    "language": "Bahasa",
+    "langEn": "Inggris",
+    "langId": "Indonesia",
+    "help": "Bantuan",
+    "logout": "Keluar"
+  },
+  "Metadata": {
+    "title": "T2S - Platform Modern",
+    "description": "Platform tercanggih untuk kebutuhan digital Anda.",
+    "home": "Beranda | T2S",
+    "studio": "Studio | T2S",
+    "billing": "Tagihan | T2S"
+  }
+}

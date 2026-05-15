@@ -2,17 +2,18 @@
 
 import {
   BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
   Sparkles,
   Sun,
   Moon,
   Monitor,
   LifeBuoy,
+  Languages,
 } from "lucide-react"
 import { useTheme } from "next-themes"
+import { useTranslations, useLocale } from "next-intl"
+import { useRouter, usePathname } from "@/i18n/routing"
 
 import {
   Avatar,
@@ -52,6 +53,14 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const { theme, setTheme } = useTheme()
+  const t = useTranslations('NavUser')
+  const locale = useLocale()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const handleLanguageChange = (nextLocale: string) => {
+    router.replace(pathname, { locale: nextLocale })
+  }
 
   return (
     <SidebarMenu>
@@ -95,50 +104,70 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Sparkles />
-                Upgrade to Pro
+                {t('upgrade')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck />
-                Account
+                {t('account')}
               </DropdownMenuItem>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   {theme === "light" && <Sun />}
                   {theme === "dark" && <Moon />}
                   {theme === "system" && <Monitor />}
-                  Theme
+                  {t('theme')}
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
                     <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
                       <DropdownMenuRadioItem value="light">
                         <Sun />
-                        Light
+                        {t('themeLight')}
                       </DropdownMenuRadioItem>
                       <DropdownMenuRadioItem value="dark">
                         <Moon />
-                        Dark
+                        {t('themeDark')}
                       </DropdownMenuRadioItem>
                       <DropdownMenuRadioItem value="system">
                         <Monitor />
-                        System
+                        {t('themeSystem')}
                       </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
               </DropdownMenuSub>
+
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Languages />
+                  {t('language')}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioGroup value={locale} onValueChange={handleLanguageChange}>
+                      <DropdownMenuRadioItem value="en">
+                        {t('langEn')}
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="id">
+                        {t('langId')}
+                      </DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+
               <DropdownMenuItem>
                 <LifeBuoy />
-                Help
+                {t('help')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LogOut />
-              Log out
+              {t('logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

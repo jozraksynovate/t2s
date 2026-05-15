@@ -6,8 +6,18 @@ import {
 } from "@/components/ui/sidebar"
 import React from "react"
 import { AppHeader } from "@/components/app-header"
+import { setRequestLocale } from 'next-intl/server';
 
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({
+  children,
+  params
+}: {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const cookieStore = await cookies()
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 

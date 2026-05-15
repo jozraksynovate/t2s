@@ -1,0 +1,32 @@
+{
+  "HomePage": {
+    "title": "Welcome to T2S",
+    "description": "The best platform for your needs."
+  },
+  "Navigation": {
+    "home": "Home",
+    "studio": "Studio",
+    "billing": "Billing",
+    "settings": "Settings"
+  },
+  "NavUser": {
+    "upgrade": "Upgrade to Pro",
+    "account": "Account",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "language": "Language",
+    "langEn": "English",
+    "langId": "Indonesian",
+    "help": "Help",
+    "logout": "Log out"
+  },
+  "Metadata": {
+    "title": "T2S - Modern Platform",
+    "description": "The most advanced platform for your digital needs.",
+    "home": "Home | T2S",
+    "studio": "Studio | T2S",
+    "billing": "Billing | T2S"
+  }
+}

@@ -1,7 +1,8 @@
 "use client"
 
-import { usePathname } from "next/navigation"
-import Link from "next/link"
+import { Link } from "@/i18n/routing"
+import { useTranslations } from "next-intl"
+import { usePathname } from "@/i18n/routing"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,6 +19,10 @@ import React from "react"
 
 export function AppHeader() {
   const pathname = usePathname()
+  const t = useTranslations('Navigation')
+  
+  // With next-intl's usePathname, the locale is already stripped.
+  // Example: /app/studio (even if the URL is /en/app/studio)
   const pathSegments = pathname.split("/").filter(Boolean)
 
   return (
@@ -31,7 +36,7 @@ export function AppHeader() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/app">Home</Link>
+              <Link href="/app">{t('home')}</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           {pathSegments.length > 1 && (
@@ -39,7 +44,9 @@ export function AppHeader() {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  {pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1)}
+                  {t.has(pathSegments[1]) 
+                    ? t(pathSegments[1]) 
+                    : pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1)}
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </>
