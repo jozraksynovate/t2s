@@ -7,7 +7,8 @@
     "home": "Beranda",
     "studio": "Studio",
     "billing": "Tagihan",
-    "settings": "Pengaturan"
+    "settings": "Pengaturan",
+    "platform": "Platform"
   },
   "NavUser": {
     "upgrade": "Upgrade ke Pro",

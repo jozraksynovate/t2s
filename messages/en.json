@@ -7,7 +7,8 @@
     "home": "Home",
     "studio": "Studio",
     "billing": "Billing",
-    "settings": "Settings"
+    "settings": "Settings",
+    "platform": "Platform"
   },
   "NavUser": {
     "upgrade": "Upgrade to Pro",
