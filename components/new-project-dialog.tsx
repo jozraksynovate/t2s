@@ -74,7 +74,7 @@ export function NewProjectDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       {showTrigger && (
         <DialogTrigger asChild>
-          <Button variant="default">{t('trigger')}</Button>
+          <Button>{t('trigger')}</Button>
         </DialogTrigger>
       )}
       <DialogContent className="sm:max-w-sm">

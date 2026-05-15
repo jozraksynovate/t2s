@@ -71,5 +71,9 @@
     "newProject": "New Project",
     "searchPlaceholder": "Type a command or search...",
     "emptyResults": "No results found."
+  },
+  "Studio": {
+    "docs": "Docs",
+    "export": "Export"
   }
 }

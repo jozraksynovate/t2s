@@ -23,6 +23,7 @@ export function AppHeader() {
   const pathname = usePathname()
   const t = useTranslations('Navigation')
   const tNew = useTranslations('NewProject')
+  const tStudio = useTranslations('Studio')
   const searchParams = useSearchParams()
   const projectNameParam = searchParams.get('name')
   
@@ -81,14 +82,23 @@ export function AppHeader() {
           )}
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-2">
         {pathname === "/app/studio" && (
           <Button 
-            variant="default" 
             onClick={() => window.dispatchEvent(new CustomEvent("open-new-project"))}
           >
             {tNew('trigger')}
           </Button>
+        )}
+        {pathSegments.length >= 3 && pathSegments[0] === "app" && pathSegments[1] === "studio" && (
+          <>
+            <Button variant="outline">
+              {tStudio('docs')}
+            </Button>
+            <Button variant="outline">
+              {tStudio('export')}
+            </Button>
+          </>
         )}
       </div>
     </header>

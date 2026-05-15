@@ -71,5 +71,9 @@
     "newProject": "Proyek Baru",
     "searchPlaceholder": "Ketik perintah atau cari...",
     "emptyResults": "Hasil tidak ditemukan."
+  },
+  "Studio": {
+    "docs": "Dokumentasi",
+    "export": "Ekspor"
   }
 }
