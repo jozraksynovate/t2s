@@ -24,7 +24,7 @@ export default async function StudioPage({
   setRequestLocale(locale);
 
   return (
-    <>
+    <div className="p-4">
       <div className="grid auto-rows-min gap-4 md:grid-cols-3">
         {projects.map((project) => (
           <ProjectItem 
@@ -34,6 +34,6 @@ export default async function StudioPage({
           />
         ))}
       </div>
-    </>
+    </div>
   )
 }

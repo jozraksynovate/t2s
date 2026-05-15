@@ -31,8 +31,14 @@ export default async function ProjectStudioPage({
   setRequestLocale(locale);
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
-      {/* Studio content will go here */}
-    </div>
+    <main className="flex flex-1 overflow-hidden h-full">
+      <section className="flex-1 overflow-y-auto p-4">
+        {/* Studio content (editor) will go here */}
+      </section>
+      
+      <aside className="hidden md:block w-80 border-l overflow-y-auto p-4">
+        {/* Settings panel content will go here */}
+      </aside>
+    </main>
   )
 }
