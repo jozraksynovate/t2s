@@ -1,12 +1,6 @@
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 import { projects } from '@/lib/data';
-import { StudioEditor } from '@/components/studio-editor';
-import { StudioComposer } from '@/components/studio-composer';
-import { StudioAudioPlayer } from '@/components/studio-audio-player';
-import { StudioGenerateFooter } from '@/components/studio-generate-footer';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Copy } from 'lucide-react';
+import { StudioWorkspace } from '@/components/studio-workspace';
 
 export async function generateMetadata({
   params,
@@ -36,42 +30,6 @@ export default async function ProjectStudioPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations({ locale, namespace: 'Studio' });
 
-  return (
-    <main className="flex flex-1 overflow-hidden h-full">
-      <section className="flex flex-1 flex-col overflow-hidden">
-        <div className="flex flex-1 flex-col overflow-y-auto p-4">
-          <Tabs defaultValue="text" className="flex flex-1 flex-col">
-            <div className="flex items-center justify-between">
-              <TabsList className="w-fit">
-                <TabsTrigger value="text">{t('tabText')}</TabsTrigger>
-                <TabsTrigger value="composer">{t('tabComposer')}</TabsTrigger>
-              </TabsList>
-              <Button variant="ghost" size="icon" aria-label={t('copy')}>
-                <Copy aria-hidden="true" />
-              </Button>
-            </div>
-            <TabsContent value="text" className="flex flex-1 flex-col">
-              <StudioEditor />
-            </TabsContent>
-            <TabsContent value="composer" className="">
-              <StudioComposer />
-            </TabsContent>
-          </Tabs>
-        </div>
-        <div className="border-t p-4 flex items-center gap-4">
-          <StudioAudioPlayer />
-          <StudioGenerateFooter 
-            generateText={t('generate')} 
-            generateTooltip={t('generateTooltip')} 
-          />
-        </div>
-      </section>
-      
-      <aside className="hidden md:block w-80 border-l overflow-y-auto p-4">
-        {/* Settings panel content will go here */}
-      </aside>
-    </main>
-  )
+  return <StudioWorkspace />
 }

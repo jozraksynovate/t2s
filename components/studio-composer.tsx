@@ -22,33 +22,26 @@ import {
 } from "@/components/ui/tooltip"
 import { Button } from "@/components/ui/button"
 
-interface SpeechBlock {
-  id: string
-  speakerId: number
-  text: string
+import { type Speaker, type SpeechBlock } from "@/lib/studio"
+
+
+interface StudioComposerProps {
+  speakers: Speaker[]
+  blocks: SpeechBlock[]
+  onAddBlock: () => void
+  onRemoveBlock: (id: string) => void
+  onUpdateBlock: (id: string, text: string) => void
 }
 
-export function StudioComposer() {
+export function StudioComposer({ 
+  speakers, 
+  blocks, 
+  onAddBlock, 
+  onRemoveBlock, 
+  onUpdateBlock 
+}: StudioComposerProps) {
   const t = useTranslations("Studio")
-  const [blocks, setBlocks] = useState<SpeechBlock[]>([
-    { id: crypto.randomUUID(), speakerId: 1, text: "" },
-  ])
   const lastBlockRef = useRef<HTMLDivElement>(null)
-
-  const addBlock = () => {
-    const lastBlock = blocks[blocks.length - 1]
-    const nextSpeakerId = lastBlock.speakerId === 1 ? 2 : 1
-    
-    setBlocks([
-      ...blocks,
-      { id: crypto.randomUUID(), speakerId: nextSpeakerId, text: "" },
-    ])
-  }
-
-  const removeBlock = (id: string) => {
-    if (blocks.length === 1) return // Keep at least one block
-    setBlocks(blocks.filter((block) => block.id !== id))
-  }
 
   // Auto-scroll to the new block when it's added
   useEffect(() => {
@@ -56,6 +49,7 @@ export function StudioComposer() {
       lastBlockRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
     }
   }, [blocks.length])
+
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -76,7 +70,8 @@ export function StudioComposer() {
                 minRows={3}
                 className="flex field-sizing-content min-h-16 w-full resize-none rounded-none bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:ring-0 md:text-sm"
                 placeholder={t("placeholder")}
-                defaultValue={block.text}
+                value={block.text}
+                onChange={(e) => onUpdateBlock(block.id, e.target.value)}
                 aria-label={`${t("tabComposer")} ${index + 1}`}
               />
               <InputGroupAddon align="block-start" className="border-b">
@@ -85,8 +80,11 @@ export function StudioComposer() {
                   variant="outline"
                 >
                   <User data-icon="inline-start" aria-hidden="true" />
-                  {block.speakerId === 1 ? t("speakerZephyr") : t("speakerPuck")}
+                  {speakers.find(s => s.id === block.speakerId)?.name || `Speaker ${block.speakerId}`}
+                  {" - "}
+                  {speakers.find(s => s.id === block.speakerId)?.voice || "Zephyr"}
                 </InputGroupButton>
+
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <InputGroupButton 
@@ -106,7 +104,7 @@ export function StudioComposer() {
                       variant="ghost" 
                       size="icon-sm"
                       aria-label={t("deleteTooltip")}
-                      onClick={() => removeBlock(block.id)}
+                      onClick={() => onRemoveBlock(block.id)}
                     >
                       <X aria-hidden="true" />
                     </InputGroupButton>
@@ -118,7 +116,7 @@ export function StudioComposer() {
 
             {isLast && (
               <div className="flex justify-center">
-                <Button variant="ghost" onClick={addBlock}>
+                <Button variant="ghost" onClick={onAddBlock}>
                   <Plus aria-hidden="true" />
                   {t("addBlock")}
                 </Button>
