@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { projects } from '@/lib/data';
 import { StudioEditor } from '@/components/studio-editor';
+import { StudioComposer } from '@/components/studio-composer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export async function generateMetadata({
@@ -31,20 +32,21 @@ export default async function ProjectStudioPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'Studio' });
 
   return (
     <main className="flex flex-1 overflow-hidden h-full">
-      <section className="flex flex-1 flex-col overflow-hidden p-4">
+      <section className="flex flex-1 flex-col overflow-y-auto p-4">
         <Tabs defaultValue="text" className="flex flex-1 flex-col">
           <TabsList className="w-fit">
-            <TabsTrigger value="text">Text</TabsTrigger>
-            <TabsTrigger value="composer">Composer</TabsTrigger>
+            <TabsTrigger value="text">{t('tabText')}</TabsTrigger>
+            <TabsTrigger value="composer">{t('tabComposer')}</TabsTrigger>
           </TabsList>
           <TabsContent value="text" className="flex-1">
             <StudioEditor />
           </TabsContent>
-          <TabsContent value="composer" className="flex-1">
-            <StudioEditor />
+          <TabsContent value="composer" className="">
+            <StudioComposer />
           </TabsContent>
         </Tabs>
       </section>

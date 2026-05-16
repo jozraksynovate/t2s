@@ -5,13 +5,13 @@ import {
   Trash2,
   User,
 } from "lucide-react"
+import TextareaAutosize from "react-textarea-autosize"
 import { useTranslations } from "next-intl"
 
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupTextarea,
 } from "@/components/ui/input-group"
 import {
   Tooltip,
@@ -19,17 +19,22 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-export function StudioEditor() {
+export function StudioComposer() {
   const t = useTranslations("Studio")
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <InputGroup className="flex-1" role="group" aria-labelledby="editor-title">
-        <InputGroupTextarea
-          id="textarea-text"
+    <div className="flex w-full flex-col">
+      <InputGroup 
+        className="h-auto! min-h-0!" 
+        role="group" 
+        aria-labelledby="composer-title"
+      >
+        <TextareaAutosize
+          data-slot="input-group-control"
+          minRows={3}
+          className="flex field-sizing-content min-h-16 w-full resize-none rounded-none bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:ring-0 md:text-sm"
           placeholder={t("placeholder")}
-          className="flex-1"
-          aria-label={t("tabText")}
+          aria-label={t("tabComposer")}
         />
         <InputGroupAddon align="block-start" className="border-b">
           <InputGroupButton 
@@ -40,7 +45,7 @@ export function StudioEditor() {
             <User data-icon="inline-start" aria-hidden="true" />
             {t("speaker")}
           </InputGroupButton>
-          
+
           <Tooltip>
             <TooltipTrigger asChild>
               <InputGroupButton 

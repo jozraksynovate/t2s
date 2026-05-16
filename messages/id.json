@@ -74,6 +74,12 @@
   },
   "Studio": {
     "docs": "Dokumentasi",
-    "export": "Ekspor"
+    "export": "Ekspor",
+    "tabText": "Teks",
+    "tabComposer": "Komposer",
+    "placeholder": "[excitedly] Halo, saya adalah model teks-ke-suara baru, dan saya bisa mengucapkan banyak hal dengan berbagai cara. Bagaimana saya bisa membantu Anda hari ini?",
+    "speaker": "Pembicara 1 - Zephyr",
+    "aiTooltip": "Asisten AI",
+    "deleteTooltip": "Hapus"
   }
 }
