@@ -2,7 +2,7 @@
 
 import {
   Sparkles,
-  Trash2,
+  X,
   User,
 } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -57,11 +57,11 @@ export function StudioEditor() {
           <Tooltip>
             <TooltipTrigger asChild>
               <InputGroupButton 
-                variant="destructive" 
+                variant="ghost" 
                 size="icon-sm"
                 aria-label={t("deleteTooltip")}
               >
-                <Trash2 aria-hidden="true" />
+                <X aria-hidden="true" />
               </InputGroupButton>
             </TooltipTrigger>
             <TooltipContent>{t("deleteTooltip")}</TooltipContent>

@@ -80,6 +80,8 @@
     "placeholder": "[excitedly] Hey there, I'm a new text to speech model, and I can say things in many different ways. How can I help you today?",
     "speaker": "Speaker 1 - Zephyr",
     "aiTooltip": "AI assistant",
-    "deleteTooltip": "Delete"
+    "deleteTooltip": "Delete",
+    "addBlock": "Add speech block",
+    "copy": "Copy"
   }
 }
