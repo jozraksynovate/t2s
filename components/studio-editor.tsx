@@ -35,10 +35,10 @@ export function StudioEditor() {
           <InputGroupButton 
             size="sm" 
             variant="outline"
-            aria-label={t("speaker")}
+            aria-label={t("speakerZephyr")}
           >
             <User data-icon="inline-start" aria-hidden="true" />
-            {t("speaker")}
+            {t("speakerZephyr")}
           </InputGroupButton>
           
           <Tooltip>

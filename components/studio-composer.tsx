@@ -85,9 +85,8 @@ export function StudioComposer() {
                   variant="outline"
                 >
                   <User data-icon="inline-start" aria-hidden="true" />
-                  {block.speakerId === 1 ? "Speaker 1 - Zephyr" : "Speaker 2 - Puck"}
+                  {block.speakerId === 1 ? t("speakerZephyr") : t("speakerPuck")}
                 </InputGroupButton>
-
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <InputGroupButton 
