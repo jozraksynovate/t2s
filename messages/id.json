@@ -85,6 +85,7 @@
     "aiTooltip": "Asisten AI",
     "deleteTooltip": "Hapus",
     "addBlock": "Tambah blok suara",
-    "copy": "Salin"
+    "copy": "Salin",
+    "generate": "Hasilkan"
   }
 }

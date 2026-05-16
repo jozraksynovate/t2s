@@ -85,6 +85,7 @@
     "aiTooltip": "AI assistant",
     "deleteTooltip": "Delete",
     "addBlock": "Add speech block",
-    "copy": "Copy"
+    "copy": "Copy",
+    "generate": "Generate"
   }
 }

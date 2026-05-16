@@ -38,24 +38,31 @@ export default async function ProjectStudioPage({
 
   return (
     <main className="flex flex-1 overflow-hidden h-full">
-      <section className="flex flex-1 flex-col overflow-y-auto p-4">
-        <Tabs defaultValue="text" className="flex flex-1 flex-col">
-          <div className="flex items-center justify-between">
-            <TabsList className="w-fit">
-              <TabsTrigger value="text">{t('tabText')}</TabsTrigger>
-              <TabsTrigger value="composer">{t('tabComposer')}</TabsTrigger>
-            </TabsList>
-            <Button variant="ghost" size="icon" aria-label={t('copy')}>
-              <Copy aria-hidden="true" />
-            </Button>
-          </div>
-          <TabsContent value="text" className="flex-1">
-            <StudioEditor />
-          </TabsContent>
-          <TabsContent value="composer" className="">
-            <StudioComposer />
-          </TabsContent>
-        </Tabs>
+      <section className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-y-auto p-4">
+          <Tabs defaultValue="text" className="flex flex-1 flex-col">
+            <div className="flex items-center justify-between">
+              <TabsList className="w-fit">
+                <TabsTrigger value="text">{t('tabText')}</TabsTrigger>
+                <TabsTrigger value="composer">{t('tabComposer')}</TabsTrigger>
+              </TabsList>
+              <Button variant="ghost" size="icon" aria-label={t('copy')}>
+                <Copy aria-hidden="true" />
+              </Button>
+            </div>
+            <TabsContent value="text" className="flex flex-1 flex-col">
+              <StudioEditor />
+            </TabsContent>
+            <TabsContent value="composer" className="">
+              <StudioComposer />
+            </TabsContent>
+          </Tabs>
+        </div>
+        <div className="border-t p-4 flex justify-end">
+          <Button>
+            {t('generate')}
+          </Button>
+        </div>
       </section>
       
       <aside className="hidden md:block w-80 border-l overflow-y-auto p-4">
