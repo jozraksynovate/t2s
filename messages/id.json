@@ -86,6 +86,8 @@
     "deleteTooltip": "Hapus",
     "addBlock": "Tambah blok suara",
     "copy": "Salin",
-    "generate": "Hasilkan"
+    "generate": "Hasilkan",
+    "playTooltip": "Putar/Jeda",
+    "generateTooltip": "Hasilkan audio"
   }
 }

@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { projects } from '@/lib/data';
 import { StudioEditor } from '@/components/studio-editor';
 import { StudioComposer } from '@/components/studio-composer';
+import { StudioAudioPlayer } from '@/components/studio-audio-player';
+import { StudioGenerateFooter } from '@/components/studio-generate-footer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Copy } from 'lucide-react';
@@ -58,10 +60,12 @@ export default async function ProjectStudioPage({
             </TabsContent>
           </Tabs>
         </div>
-        <div className="border-t p-4 flex justify-end">
-          <Button>
-            {t('generate')}
-          </Button>
+        <div className="border-t p-4 flex items-center gap-4">
+          <StudioAudioPlayer />
+          <StudioGenerateFooter 
+            generateText={t('generate')} 
+            generateTooltip={t('generateTooltip')} 
+          />
         </div>
       </section>
       

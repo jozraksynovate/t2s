@@ -86,6 +86,8 @@
     "deleteTooltip": "Delete",
     "addBlock": "Add speech block",
     "copy": "Copy",
-    "generate": "Generate"
+    "generate": "Generate",
+    "playTooltip": "Play/Pause",
+    "generateTooltip": "Generate audio"
   }
 }
