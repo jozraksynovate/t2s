@@ -76,6 +76,7 @@
     "docs": "Dokumentasi",
     "export": "Ekspor",
     "tabText": "Teks",
+    "tabTextLabel": "Teks",
     "tabComposer": "Komposer",
     "placeholder": "[excitedly] Halo, saya adalah model teks-ke-suara baru, dan saya bisa mengucapkan banyak hal dengan berbagai cara. Bagaimana saya bisa membantu Anda hari ini?",
     "speaker": "Pembicara 1 - Zephyr",

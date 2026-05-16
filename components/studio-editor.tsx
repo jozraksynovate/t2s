@@ -3,7 +3,6 @@
 import {
   Sparkles,
   X,
-  User,
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 
@@ -12,6 +11,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
   InputGroupTextarea,
+  InputGroupText,
 } from "@/components/ui/input-group"
 import {
   Tooltip,
@@ -32,14 +32,9 @@ export function StudioEditor() {
           aria-label={t("tabText")}
         />
         <InputGroupAddon align="block-start" className="border-b">
-          <InputGroupButton 
-            size="sm" 
-            variant="outline"
-            aria-label={t("speakerZephyr")}
-          >
-            <User data-icon="inline-start" aria-hidden="true" />
-            {t("speakerZephyr")}
-          </InputGroupButton>
+          <InputGroupText>
+            {t("tabTextLabel")}
+          </InputGroupText>
           
           <Tooltip>
             <TooltipTrigger asChild>
