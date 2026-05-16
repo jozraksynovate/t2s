@@ -2,7 +2,6 @@
 
 import {
   Sparkles,
-  X,
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 
@@ -47,19 +46,6 @@ export function StudioEditor() {
               </InputGroupButton>
             </TooltipTrigger>
             <TooltipContent>{t("aiTooltip")}</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <InputGroupButton 
-                variant="ghost" 
-                size="icon-sm"
-                aria-label={t("deleteTooltip")}
-              >
-                <X aria-hidden="true" />
-              </InputGroupButton>
-            </TooltipTrigger>
-            <TooltipContent>{t("deleteTooltip")}</TooltipContent>
           </Tooltip>
         </InputGroupAddon>
       </InputGroup>
