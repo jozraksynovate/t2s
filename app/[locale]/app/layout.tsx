@@ -27,9 +27,9 @@ export default async function AppLayout({
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="flex h-screen flex-col overflow-hidden">
         <AppHeader />
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col overflow-hidden">
           {children}
         </div>
       </SidebarInset>
