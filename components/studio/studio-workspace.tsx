@@ -147,7 +147,7 @@ export function StudioWorkspace({
                     <DrawerHeader>
                       <DrawerTitle>{t("config")}</DrawerTitle>
                       <DrawerDescription>
-                        {t("modelDescription")}
+                        {t("configDescription")}
                       </DrawerDescription>
                     </DrawerHeader>
                     <div className="no-scrollbar overflow-y-auto px-4 pb-4 flex-1">

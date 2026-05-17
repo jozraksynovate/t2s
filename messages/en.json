@@ -94,6 +94,8 @@
     "playTooltip": "Play/Pause",
     "generateTooltip": "Generate audio",
     "config": "Studio Configuration",
+    "configDescription": "Configure voice models, scenes, and characters for your studio.",
+    "voiceModel": "Voice Model",
     "modelLabel": "Model",
     "modelGroup": "AI Voice Models",
     "modelDescription": "Pick the AI voice model that fits your script perfectly.",

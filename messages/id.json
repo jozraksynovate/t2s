@@ -94,6 +94,8 @@
     "playTooltip": "Putar/Jeda",
     "generateTooltip": "Hasilkan audio",
     "config": "Konfigurasi Studio",
+    "configDescription": "Konfigurasikan model suara, latar adegan, dan karakter untuk studiomu.",
+    "voiceModel": "Model Suara",
     "modelLabel": "Model",
     "modelGroup": "Model Suara AI",
     "modelDescription": "Pilih model suara AI yang paling pas buat ngisi suara naskahmu.",

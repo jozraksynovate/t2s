@@ -77,7 +77,7 @@ export function StudioSettings({
   return (
     <FieldGroup>
       <FieldSet>
-        <FieldLegend>{t("config")}</FieldLegend>
+        <FieldLegend>{t("voiceModel")}</FieldLegend>
         <FieldDescription>
           {t("modelDescription")}
         </FieldDescription>
