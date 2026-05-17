@@ -10,6 +10,16 @@ import { StudioSettings } from "./studio-settings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { DEFAULT_SPEAKERS, type Speaker, type SpeechBlock } from "@/lib/studio"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerFooter,
+} from "@/components/ui/drawer"
 
 export function StudioWorkspace({
   defaultSettingsOpen = true
@@ -29,6 +39,7 @@ export function StudioWorkspace({
     { id: crypto.randomUUID(), speakerId: 1, text: "" },
   ])
   const [isSettingsOpen, setIsSettingsOpen] = useState(defaultSettingsOpen)
+  const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false)
 
   const toggleSettings = (open: boolean) => {
     setIsSettingsOpen(open)
@@ -114,6 +125,52 @@ export function StudioWorkspace({
                   <Settings aria-hidden="true" />
                 </Button>
               </div>
+              <div className="flex md:hidden items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t("aiTooltip")}
+                >
+                  <Sparkles aria-hidden="true" />
+                </Button>
+                <Drawer direction="right" open={isMobileSettingsOpen} onOpenChange={setIsMobileSettingsOpen}>
+                  <DrawerTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={t("toggleSettings")}
+                    >
+                      <Settings aria-hidden="true" />
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <DrawerTitle>{t("config")}</DrawerTitle>
+                      <DrawerDescription>
+                        {t("modelDescription")}
+                      </DrawerDescription>
+                    </DrawerHeader>
+                    <div className="no-scrollbar overflow-y-auto px-4 pb-4 flex-1">
+                      <StudioSettings
+                        mode={activeTab}
+                        speakers={activeSpeakers}
+                        onUpdateSpeaker={updateSpeaker}
+                        globalConfig={globalConfig}
+                        onUpdateGlobalConfig={updateGlobalConfig}
+                        activeSpeakerId={activeSpeakerId}
+                        onConfigureSpeaker={setActiveSpeakerId}
+                      />
+                    </div>
+                    <DrawerFooter>
+                      <DrawerClose asChild>
+                        <Button variant="outline" className="w-full">
+                          {t("close")}
+                        </Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </DrawerContent>
+                </Drawer>
+              </div>
             </div>
             <TabsContent value="text" className="flex flex-1 flex-col">
               <StudioEditor />
@@ -128,6 +185,7 @@ export function StudioWorkspace({
                 onConfigureSpeaker={(id) => {
                   setActiveSpeakerId(id)
                   toggleSettings(true)
+                  setIsMobileSettingsOpen(true)
                 }}
               />
             </TabsContent>

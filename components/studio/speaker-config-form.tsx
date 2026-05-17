@@ -56,7 +56,7 @@ export function SpeakerConfigForm({ speaker, onUpdate }: SpeakerConfigFormProps)
         </DrawerDescription>
       </DrawerHeader>
 
-      <div className="no-scrollbar overflow-y-auto p-4">
+      <div className="no-scrollbar overflow-y-auto px-4 pb-4 flex-1">
         <FieldGroup>
           {/* Audio Profile Section */}
           <FieldSet>
