@@ -1,12 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { useTranslations } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
 
-export default function Page({
-  params
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default function Page() {
   const t = useTranslations('HomePage');
   return (
     <div className="flex min-h-svh p-6">

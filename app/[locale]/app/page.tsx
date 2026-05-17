@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button"
-import { useTranslations } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 export async function generateMetadata({
