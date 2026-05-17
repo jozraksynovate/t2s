@@ -405,6 +405,10 @@ export function StudioWorkspace({
   const currentTimeStr = formatTime(currentTime)
   const durationStr = formatTime(duration)
 
+  const isGenerateDisabled = activeTab === "text"
+    ? !singleText.trim()
+    : !blocks.some(b => b.text.trim().length > 0)
+
   return (
     <main className="flex flex-1 overflow-hidden h-full w-full">
       <section className="flex flex-1 flex-col overflow-hidden">
@@ -517,6 +521,7 @@ export function StudioWorkspace({
             durationStr={durationStr}
             onGenerate={handleGenerate}
             hasAudio={!!audioUrl}
+            isGenerateDisabled={isGenerateDisabled}
           />
         </div>
       </section>

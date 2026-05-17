@@ -16,6 +16,11 @@ import { Button } from "@/components/ui/button"
 import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useSearchParams } from "next/navigation"
 import React from "react"
 
@@ -95,9 +100,16 @@ export function AppHeader() {
             <Button variant="outline">
               {tStudio('docs')}
             </Button>
-            <Button onClick={() => window.dispatchEvent(new CustomEvent("trigger-export"))}>
-              {tStudio('export')}
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={() => window.dispatchEvent(new CustomEvent("trigger-export"))}>
+                  {tStudio('export')}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {tStudio('exportTooltip')}
+              </TooltipContent>
+            </Tooltip>
           </>
         )}
       </div>

@@ -25,6 +25,7 @@ interface StudioControlsProps {
   durationStr: string
   onGenerate: () => void
   hasAudio: boolean
+  isGenerateDisabled?: boolean
 }
 
 export function StudioControls({
@@ -39,6 +40,7 @@ export function StudioControls({
   durationStr,
   onGenerate,
   hasAudio,
+  isGenerateDisabled = false,
 }: StudioControlsProps) {
   const t = useTranslations("Studio")
 
@@ -57,7 +59,7 @@ export function StudioControls({
       const isMod = e.metaKey || e.ctrlKey
       if (isMod && e.key === "Enter") {
         e.preventDefault()
-        if (!isGenerating) {
+        if (!isGenerating && !isGenerateDisabled) {
           onGenerate()
         }
       }
@@ -121,7 +123,7 @@ export function StudioControls({
           <TooltipTrigger asChild>
             <Button 
               onClick={onGenerate} 
-              disabled={isGenerating} 
+              disabled={isGenerating || isGenerateDisabled} 
               className="shrink-0 font-medium"
             >
               {isGenerating ? (
