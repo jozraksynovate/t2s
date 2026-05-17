@@ -1,8 +1,6 @@
 "use client"
 
-import {
-  Sparkles,
-} from "lucide-react"
+import { Mic } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 import {
@@ -38,14 +36,15 @@ export function StudioEditor() {
           <Tooltip>
             <TooltipTrigger asChild>
               <InputGroupButton 
-                className="ml-auto" 
+                className="ml-auto opacity-0 group-hover/input-group:opacity-100 focus-visible:opacity-100 transition-opacity" 
+                variant="outline"
                 size="icon-sm"
-                aria-label={t("aiTooltip")}
+                aria-label={t("speechToTextTooltip")}
               >
-                <Sparkles aria-hidden="true" />
+                <Mic aria-hidden="true" />
               </InputGroupButton>
             </TooltipTrigger>
-            <TooltipContent>{t("aiTooltip")}</TooltipContent>
+            <TooltipContent>{t("speechToTextTooltip")}</TooltipContent>
           </Tooltip>
         </InputGroupAddon>
       </InputGroup>

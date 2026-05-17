@@ -2,10 +2,10 @@
 
 import { useEffect, useRef } from "react"
 import {
-  Sparkles,
   X,
   User,
   Plus,
+  Mic,
 } from "lucide-react"
 import TextareaAutosize from "react-textarea-autosize"
 import { useTranslations } from "next-intl"
@@ -43,12 +43,14 @@ export function StudioComposer({
 }: StudioComposerProps) {
   const t = useTranslations("Studio")
   const lastBlockRef = useRef<HTMLDivElement>(null)
+  const prevBlocksLengthRef = useRef(blocks.length)
 
   // Auto-scroll to the new block when it's added
   useEffect(() => {
-    if (blocks.length > 1) {
+    if (blocks.length > prevBlocksLengthRef.current && blocks.length > 1) {
       lastBlockRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
     }
+    prevBlocksLengthRef.current = blocks.length
   }, [blocks.length])
 
   return (
@@ -89,19 +91,21 @@ export function StudioComposer({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <InputGroupButton 
-                      className="ml-auto" 
+                      className="ml-auto opacity-0 group-hover/input-group:opacity-100 focus-visible:opacity-100 transition-opacity" 
+                      variant="outline"
                       size="icon-sm"
-                      aria-label={t("aiTooltip")}
+                      aria-label={t("speechToTextTooltip")}
                     >
-                      <Sparkles aria-hidden="true" />
+                      <Mic aria-hidden="true" />
                     </InputGroupButton>
                   </TooltipTrigger>
-                  <TooltipContent>{t("aiTooltip")}</TooltipContent>
+                  <TooltipContent>{t("speechToTextTooltip")}</TooltipContent>
                 </Tooltip>
 
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <InputGroupButton 
+                      className="opacity-0 group-hover/input-group:opacity-100 focus-visible:opacity-100 transition-opacity"
                       variant="ghost" 
                       size="icon-sm"
                       aria-label={t("deleteTooltip")}
