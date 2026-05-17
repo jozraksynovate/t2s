@@ -31,6 +31,7 @@ interface StudioComposerProps {
   onAddBlock: () => void
   onRemoveBlock: (id: string) => void
   onUpdateBlock: (id: string, text: string) => void
+  onConfigureSpeaker?: (id: number) => void
 }
 
 export function StudioComposer({ 
@@ -38,7 +39,8 @@ export function StudioComposer({
   blocks, 
   onAddBlock, 
   onRemoveBlock, 
-  onUpdateBlock 
+  onUpdateBlock,
+  onConfigureSpeaker
 }: StudioComposerProps) {
   const t = useTranslations("Studio")
   const lastBlockRef = useRef<HTMLDivElement>(null)
@@ -78,9 +80,10 @@ export function StudioComposer({
                 <InputGroupButton 
                   size="sm" 
                   variant="outline"
+                  onClick={() => onConfigureSpeaker?.(block.speakerId)}
                 >
                   <User data-icon="inline-start" aria-hidden="true" />
-                  {speakers.find(s => s.id === block.speakerId)?.name || `Speaker ${block.speakerId}`}
+                  {t("speakerName", { number: block.speakerId })}
                   {" - "}
                   {speakers.find(s => s.id === block.speakerId)?.voice || "Zephyr"}
                 </InputGroupButton>

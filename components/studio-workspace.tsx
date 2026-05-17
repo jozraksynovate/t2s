@@ -16,6 +16,7 @@ export function StudioWorkspace() {
 
   const t = useTranslations("Studio")
   const [activeTab, setActiveTab] = useState("text")
+  const [activeSpeakerId, setActiveSpeakerId] = useState<number | null>(null)
   
   const [speakers, setSpeakers] = useState<Speaker[]>(DEFAULT_SPEAKERS)
   const [globalConfig, setGlobalConfig] = useState({
@@ -89,6 +90,7 @@ export function StudioWorkspace() {
                 onAddBlock={addBlock}
                 onRemoveBlock={removeBlock}
                 onUpdateBlock={updateBlock}
+                onConfigureSpeaker={setActiveSpeakerId}
               />
             </TabsContent>
           </Tabs>
@@ -109,6 +111,8 @@ export function StudioWorkspace() {
           onUpdateSpeaker={updateSpeaker}
           globalConfig={globalConfig}
           onUpdateGlobalConfig={updateGlobalConfig}
+          activeSpeakerId={activeSpeakerId}
+          onConfigureSpeaker={setActiveSpeakerId}
         />
       </aside>
 

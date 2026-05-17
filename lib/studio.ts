@@ -32,6 +32,39 @@ export const VOICE_OPTIONS = [
 
 export type VoiceName = (typeof VOICE_OPTIONS)[number]
 
+export const VOICE_DESCRIPTORS: Record<VoiceName, string> = {
+  Zephyr: "Bright",
+  Puck: "Upbeat",
+  Charon: "Informative",
+  Kore: "Firm",
+  Fenrir: "Excitable",
+  Leda: "Youthful",
+  Orus: "Firm",
+  Aoede: "Breezy",
+  Callirrhoe: "Easy-going",
+  Autonoe: "Bright",
+  Enceladus: "Breathy",
+  Iapetus: "Clear",
+  Umbriel: "Easy-going",
+  Algieba: "Smooth",
+  Despina: "Smooth",
+  Erinome: "Clear",
+  Algenib: "Gravelly",
+  Rasalgethi: "Informative",
+  Laomedeia: "Upbeat",
+  Achernar: "Soft",
+  Alnilam: "Firm",
+  Schedar: "Even",
+  Gacrux: "Mature",
+  Pulcherrima: "Forward",
+  Achird: "Friendly",
+  Zubenelgenubi: "Casual",
+  Vindemiatrix: "Gentle",
+  Sadachbia: "Lively",
+  Sadaltager: "Knowledgeable",
+  Sulafat: "Warm",
+}
+
 export const TTS_MODELS = [
   {
     id: "gemini-3.1-flash-tts-preview",

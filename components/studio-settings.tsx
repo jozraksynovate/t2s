@@ -48,6 +48,8 @@ interface StudioSettingsProps {
     sampleContext: string
   }
   onUpdateGlobalConfig: (updates: Partial<{ scene: string, sampleContext: string }>) => void
+  activeSpeakerId?: number | null
+  onConfigureSpeaker?: (id: number | null) => void
 }
 
 export function StudioSettings({
@@ -55,12 +57,23 @@ export function StudioSettings({
   speakers: allSpeakers,
   onUpdateSpeaker,
   globalConfig,
-  onUpdateGlobalConfig
+  onUpdateGlobalConfig,
+  activeSpeakerId,
+  onConfigureSpeaker
 }: StudioSettingsProps) {
   const t = useTranslations("Studio")
 
   const isComposer = mode === "composer"
   const speakers = isComposer ? allSpeakers : allSpeakers.slice(0, 1)
+
+  const groupedModels = TTS_MODELS.reduce((acc, model) => {
+    const provider = model.provider
+    if (!acc[provider]) {
+      acc[provider] = []
+    }
+    acc[provider].push(model)
+    return acc
+  }, {} as Record<string, Array<(typeof TTS_MODELS)[number]>>)
 
   return (
     <FieldGroup>
@@ -78,14 +91,16 @@ export function StudioSettings({
                 <SelectValue placeholder={t("modelPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Google Gemini</SelectLabel>
-                  {TTS_MODELS.map((model) => (
-                    <SelectItem key={model.id} value={model.id}>
-                      {model.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
+                {Object.entries(groupedModels).map(([provider, models]) => (
+                  <SelectGroup key={provider}>
+                    <SelectLabel>{provider}</SelectLabel>
+                    {models.map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        {model.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                ))}
               </SelectContent>
             </Select>
           </Field>
@@ -136,36 +151,49 @@ export function StudioSettings({
         </FieldDescription>
         <FieldGroup>
           <ItemGroup>
-            {speakers.map((speaker) => (
-              <Item key={speaker.id} variant="outline">
-                <ItemContent>
-                  <ItemTitle>{speaker.name} - {speaker.voice}</ItemTitle>
-                  <ItemDescription className="line-clamp-2">
-                    {speaker.role || t("configureSpeaker", { name: speaker.name })}
-                  </ItemDescription>
+            {speakers.map((speaker) => {
+              const speakerName = t("speakerName", { number: speaker.id })
+              return (
+                <Item key={speaker.id} variant="outline">
+                  <ItemContent>
+                    <ItemTitle>{speakerName} - {speaker.voice}</ItemTitle>
+                    <ItemDescription className="line-clamp-2">
+                      {speaker.role || t(`voices.${speaker.voice}`)}
+                    </ItemDescription>
 
-                </ItemContent>
-                <ItemActions>
-                  <Drawer direction="right">
-                    <DrawerTrigger asChild>
-                      <Button
-                        size="icon-sm"
-                        variant="outline"
-                        className="rounded-full"
-                        aria-label={t("configureSpeaker", { name: speaker.name })}
-                      >
-                        <Settings2 className="size-4" />
-                      </Button>
-                    </DrawerTrigger>
-                    <SpeakerConfigForm
-                      speaker={speaker}
-                      onUpdate={(updates) => onUpdateSpeaker(speaker.id, updates)}
-                    />
-                  </Drawer>
-                </ItemActions>
+                  </ItemContent>
+                  <ItemActions>
+                    <Drawer 
+                      direction="right"
+                      open={activeSpeakerId === speaker.id}
+                      onOpenChange={(open) => {
+                        if (open) {
+                          onConfigureSpeaker?.(speaker.id)
+                        } else {
+                          onConfigureSpeaker?.(null)
+                        }
+                      }}
+                    >
+                      <DrawerTrigger asChild>
+                        <Button
+                          size="icon-sm"
+                          variant="outline"
+                          className="rounded-full"
+                          aria-label={t("configureSpeaker", { name: speakerName })}
+                        >
+                          <Settings2 className="size-4" />
+                        </Button>
+                      </DrawerTrigger>
+                      <SpeakerConfigForm
+                        speaker={speaker}
+                        onUpdate={(updates) => onUpdateSpeaker(speaker.id, updates)}
+                      />
+                    </Drawer>
+                  </ItemActions>
 
-              </Item>
-            ))}
+                </Item>
+              )
+            })}
           </ItemGroup>
         </FieldGroup>
       </FieldSet>

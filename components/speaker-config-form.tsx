@@ -16,6 +16,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -146,6 +147,7 @@ export function SpeakerConfigForm({ speaker, onUpdate }: SpeakerConfigFormProps)
 
                   <SelectContent>
                     <SelectGroup>
+                      <SelectLabel>{t("voiceLabel")}</SelectLabel>
                       {VOICE_OPTIONS.map((voice) => (
                         <SelectItem key={voice} value={voice}>
                           {voice}
