@@ -69,7 +69,7 @@ export function StudioComposer({
                 data-slot="input-group-control"
                 minRows={3}
                 className="flex field-sizing-content min-h-16 w-full resize-none rounded-none bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:ring-0 md:text-sm"
-                placeholder={t("placeholder")}
+                placeholder={block.speakerId === 2 ? t("placeholderSpeaker2") : t("placeholder")}
                 value={block.text}
                 onChange={(e) => onUpdateBlock(block.id, e.target.value)}
                 aria-label={`${t("tabComposer")} ${index + 1}`}
