@@ -154,7 +154,7 @@ export function StudioSettings({
                   <ItemContent>
                     <ItemTitle>{speakerName} - {speaker.voice}</ItemTitle>
                     <ItemDescription className="line-clamp-2">
-                      {speaker.role || t(`voices.${speaker.voice}`)}
+                      {t(`voices.${speaker.voice}`)}
                     </ItemDescription>
 
                   </ItemContent>

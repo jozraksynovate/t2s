@@ -76,6 +76,7 @@
     "speakerName": "Pembicara {number}",
     "docs": "Dokumentasi",
     "export": "Ekspor",
+    "exportTooltip": "Unduh file audio WAV hasil generate",
     "tabText": "Teks",
     "tabTextLabel": "Teks",
     "tabComposer": "Komposer",

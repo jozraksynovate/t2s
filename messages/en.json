@@ -76,6 +76,7 @@
     "speakerName": "Speaker {number}",
     "docs": "Docs",
     "export": "Export",
+    "exportTooltip": "Download the generated WAV audio file",
     "tabText": "Text",
     "tabTextLabel": "Text",
     "tabComposer": "Composer",

@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { Play, Pause } from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 import { Kbd } from "@/components/ui/kbd"
@@ -15,43 +16,56 @@ import { useTranslations } from "next-intl"
 interface StudioControlsProps {
   generateText: string
   generateTooltip: string
+  isGenerating: boolean
+  isPlaying: boolean
+  onPlayPauseToggle: () => void
+  progress: number
+  onSeek: (value: number) => void
+  currentTimeStr: string
+  durationStr: string
+  onGenerate: () => void
+  hasAudio: boolean
 }
 
-export function StudioControls({ generateText, generateTooltip }: StudioControlsProps) {
+export function StudioControls({
+  generateText,
+  generateTooltip,
+  isGenerating,
+  isPlaying,
+  onPlayPauseToggle,
+  progress,
+  onSeek,
+  currentTimeStr,
+  durationStr,
+  onGenerate,
+  hasAudio,
+}: StudioControlsProps) {
   const t = useTranslations("Studio")
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [progress, setProgress] = useState([0])
-
-  const handleGenerate = () => {
-    // Action implementation will go here
-    console.log("Generating...")
-  }
 
   // Unified keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input/textarea
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return
-      }
+      const isTyping = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement
       
-      // Spacebar toggles Play/Pause
-      if (e.code === "Space") {
+      // Spacebar toggles Play/Pause (only if audio is loaded and NOT typing)
+      if (e.code === "Space" && hasAudio && !isTyping) {
         e.preventDefault()
-        setIsPlaying((prev) => !prev)
+        onPlayPauseToggle()
       }
 
-      // Ctrl/Cmd + Enter triggers Generate
+      // Ctrl/Cmd + Enter triggers Generate (allowed even when typing)
       const isMod = e.metaKey || e.ctrlKey
       if (isMod && e.key === "Enter") {
         e.preventDefault()
-        handleGenerate()
+        if (!isGenerating) {
+          onGenerate()
+        }
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+  }, [onPlayPauseToggle, onGenerate, isGenerating, hasAudio])
 
   const isMac = typeof window !== "undefined" && navigator.platform.toUpperCase().indexOf('MAC') >= 0
 
@@ -64,56 +78,72 @@ export function StudioControls({ generateText, generateTooltip }: StudioControls
             <Button 
               variant="outline" 
               size="icon" 
-              onClick={() => setIsPlaying(!isPlaying)}
+              onClick={onPlayPauseToggle}
               className="shrink-0"
-              aria-label={t("playTooltip")}
+              disabled={!hasAudio}
+              aria-label={t("playTooltip") || "Play/Pause"}
             >
               {isPlaying ? (
-                <Pause fill="currentColor" aria-hidden="true" />
+                <Pause className="h-4 w-4" fill="currentColor" aria-hidden="true" />
               ) : (
-                <Play fill="currentColor" aria-hidden="true" />
+                <Play className="h-4 w-4" fill="currentColor" aria-hidden="true" />
               )}
             </Button>
           </TooltipTrigger>
           <TooltipContent className="flex items-center gap-2">
-            {t("playTooltip")}
+            {t("playTooltip") || "Play/Pause"}
             <Kbd>Space</Kbd>
           </TooltipContent>
         </Tooltip>
         
         <div className="text-sm text-muted-foreground tabular-nums shrink-0 select-none min-w-[40px] text-center">
-          0:00
+          {currentTimeStr}
         </div>
         
         <Slider
-          value={progress}
+          value={[progress]}
           max={100}
-          step={1}
-          onValueChange={setProgress}
+          step={0.1}
+          onValueChange={(val) => onSeek(val[0])}
           className="flex-1"
+          disabled={!hasAudio}
           aria-label="Progress"
         />
         
         <div className="text-sm text-muted-foreground tabular-nums shrink-0 select-none min-w-[40px] text-center">
-          0:00
+          {durationStr}
         </div>
       </div>
 
-      {/* Generation action (Right) */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button onClick={handleGenerate} className="shrink-0 font-medium">
-            {generateText}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent className="flex items-center gap-2">
-          {generateTooltip}
-          <div className="flex items-center gap-1">
-            <Kbd>{isMac ? "⌘" : "Ctrl"}</Kbd>
-            <Kbd>Enter</Kbd>
-          </div>
-        </TooltipContent>
-      </Tooltip>
+      {/* Action panel (Right) */}
+      <div className="flex items-center gap-2 shrink-0">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              onClick={onGenerate} 
+              disabled={isGenerating} 
+              className="shrink-0 font-medium"
+            >
+              {isGenerating ? (
+                <>
+                  <Spinner />
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <span>{generateText}</span>
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="flex items-center gap-2">
+            {generateTooltip}
+            <div className="flex items-center gap-1">
+              <Kbd>{isMac ? "⌘" : "Ctrl"}</Kbd>
+              <Kbd>Enter</Kbd>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </div>
     </div>
   )
 }
+

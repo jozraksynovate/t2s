@@ -79,12 +79,38 @@ export function ProjectItem({ title, description }: ProjectItemProps) {
       e.stopPropagation()
     }
     
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      toast.success(t('shareSuccess'))
-    }).catch((err) => {
-      console.error('Failed to copy: ', err)
-      toast.error('Failed to copy to clipboard')
-    })
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        toast.success(t('shareSuccess'))
+      }).catch((err) => {
+        console.error('Failed to copy: ', err)
+        toast.error('Failed to copy to clipboard')
+      })
+    } else {
+      // Robust fallback for insecure contexts (HTTP LAN IP on mobile devices)
+      try {
+        const textarea = document.createElement('textarea')
+        textarea.value = shareUrl
+        textarea.style.position = 'fixed'
+        textarea.style.top = '0'
+        textarea.style.left = '0'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.focus()
+        textarea.select()
+        const successful = document.execCommand('copy')
+        document.body.removeChild(textarea)
+        
+        if (successful) {
+          toast.success(t('shareSuccess'))
+        } else {
+          throw new Error('execCommand returned false')
+        }
+      } catch (err) {
+        console.error('Fallback copy failed: ', err)
+        toast.error('Failed to copy to clipboard')
+      }
+    }
   }
 
   const onRenameSubmit = (values: RenameFormValues) => {

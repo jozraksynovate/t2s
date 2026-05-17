@@ -95,7 +95,7 @@ export function AppHeader() {
             <Button variant="outline">
               {tStudio('docs')}
             </Button>
-            <Button>
+            <Button onClick={() => window.dispatchEvent(new CustomEvent("trigger-export"))}>
               {tStudio('export')}
             </Button>
           </>

@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useTranslations } from "next-intl"
 import { Settings, Sparkles } from "lucide-react"
+import { toast } from "sonner"
 import { StudioEditor } from "./studio-editor"
 import { StudioComposer } from "./studio-composer"
 import { StudioControls } from "./studio-controls"
@@ -10,6 +11,7 @@ import { StudioSettings } from "./studio-settings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { DEFAULT_SPEAKERS, type Speaker, type SpeechBlock } from "@/lib/studio"
+import { generateUUID } from "@/lib/utils"
 import {
   Drawer,
   DrawerContent,
@@ -36,18 +38,104 @@ export function StudioWorkspace({
     sampleContext: ""
   })
   const [blocks, setBlocks] = useState<SpeechBlock[]>([
-    { id: crypto.randomUUID(), speakerId: 1, text: "" },
+    { id: generateUUID(), speakerId: 1, text: "" },
   ])
   const [isSettingsOpen, setIsSettingsOpen] = useState(defaultSettingsOpen)
   const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false)
+
+  // Audio Generation & Playback States
+  const [singleText, setSingleText] = useState("")
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [progress, setProgress] = useState(0)
+
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  // Automatically clean up object URLs to prevent browser memory leaks
+  useEffect(() => {
+    return () => {
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl)
+      }
+    }
+  }, [audioUrl])
+
+  // Sync HTML5 Audio element events with React state
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime)
+      setProgress((audio.currentTime / (audio.duration || 1)) * 100)
+    }
+
+    const handleDurationChange = () => {
+      setDuration(audio.duration)
+    }
+
+    const handleEnded = () => {
+      setIsPlaying(false)
+      setCurrentTime(0)
+      setProgress(0)
+    }
+
+    audio.addEventListener("timeupdate", handleTimeUpdate)
+    audio.addEventListener("durationchange", handleDurationChange)
+    audio.addEventListener("ended", handleEnded)
+
+    return () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate)
+      audio.removeEventListener("durationchange", handleDurationChange)
+      audio.removeEventListener("ended", handleEnded)
+    }
+  }, [audioUrl])
+
+
+  // Pause audio when switching browser tabs (visibilitychange)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && audioRef.current && isPlaying) {
+        audioRef.current.pause()
+        setIsPlaying(false)
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [isPlaying])
 
   const toggleSettings = (open: boolean) => {
     setIsSettingsOpen(open)
     document.cookie = `studio_settings_open=${open}; path=/; max-age=${60 * 60 * 24 * 7}; path=/`
   }
 
+  // Helper to compile blocks list to single text representation
+  const compileBlocksToText = (blocksList: SpeechBlock[], currentSpeakers: Speaker[]) => {
+    if (blocksList.length === 1 && !blocksList[0].text.trim()) {
+      return ""
+    }
+    return blocksList
+      .map(b => {
+        const sp = currentSpeakers.find(s => s.id === b.speakerId)
+        const name = sp ? sp.name : `Speaker ${b.speakerId}`
+        return `${name}: ${b.text}`
+      })
+      .join("\n")
+  }
+
   const updateSpeaker = (id: number, updates: Partial<Speaker>) => {
-    setSpeakers(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s))
+    setSpeakers(prev => {
+      const updated = prev.map(s => s.id === id ? { ...s, ...updates } : s)
+      const compiled = compileBlocksToText(blocks, updated)
+      setSingleText(compiled)
+      return updated
+    })
   }
 
   const updateGlobalConfig = (updates: Partial<typeof globalConfig>) => {
@@ -57,20 +145,93 @@ export function StudioWorkspace({
   const addBlock = () => {
     const lastBlock = blocks[blocks.length - 1]
     const nextSpeakerId = lastBlock.speakerId === 1 ? 2 : 1
+    const newBlock = { id: generateUUID(), speakerId: nextSpeakerId, text: "" }
 
-    setBlocks(prev => [
-      ...prev,
-      { id: crypto.randomUUID(), speakerId: nextSpeakerId, text: "" },
-    ])
+    setBlocks(prev => {
+      const updated = [...prev, newBlock]
+      const compiled = compileBlocksToText(updated, speakers)
+      setSingleText(compiled)
+      return updated
+    })
   }
 
   const removeBlock = (id: string) => {
     if (blocks.length === 1) return
-    setBlocks(prev => prev.filter((block) => block.id !== id))
+    setBlocks(prev => {
+      const updated = prev.filter((block) => block.id !== id)
+      const compiled = compileBlocksToText(updated, speakers)
+      setSingleText(compiled)
+      return updated
+    })
   }
 
   const updateBlock = (id: string, text: string) => {
-    setBlocks(prev => prev.map(b => b.id === id ? { ...b, text } : b))
+    setBlocks(prev => {
+      const updated = prev.map(b => b.id === id ? { ...b, text } : b)
+      const compiled = compileBlocksToText(updated, speakers)
+      setSingleText(compiled)
+      return updated
+    })
+  }
+
+  // Parse unified single text editor lines back into structured dialogue blocks
+  const handleTextChange = (newText: string) => {
+    setSingleText(newText)
+
+    const lines = newText.split("\n")
+    const newBlocks: SpeechBlock[] = []
+    let currentBlock: SpeechBlock | null = null
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+      if (line.trim() === "") {
+        continue
+      }
+      
+      // Match "SpeakerName: Text" or custom names (case-insensitive)
+      const matchedSpeaker = speakers.find(sp => {
+        const escapedName = sp.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+        const regex = new RegExp(`^\\s*${escapedName}\\s*:\\s*(.*)$`, "i")
+        return regex.test(line)
+      })
+
+      if (matchedSpeaker) {
+        // Line starts with a speaker prefix! Extract the text after the colon
+        const colonIndex = line.indexOf(":")
+        const blockText = line.substring(colonIndex + 1).trim()
+
+        currentBlock = {
+          id: generateUUID(),
+          speakerId: matchedSpeaker.id,
+          text: blockText
+        }
+        newBlocks.push(currentBlock)
+      } else {
+        // If there's no speaker prefix, append line to the active block
+        if (currentBlock) {
+          // Keep newlines if it's within the block
+          currentBlock.text += (currentBlock.text ? "\n" : "") + line.trim()
+        } else {
+          // If we have no active block, create one for Speaker 1
+          currentBlock = {
+            id: generateUUID(),
+            speakerId: 1,
+            text: line.trim()
+          }
+          newBlocks.push(currentBlock)
+        }
+      }
+    }
+
+    // Filter out blocks that are completely empty if there are multiple,
+    // but ensure we keep at least one block.
+    const filteredBlocks = newBlocks.filter(b => b.text.trim().length > 0 || newBlocks.length === 1)
+    
+    if (filteredBlocks.length > 0) {
+      setBlocks(filteredBlocks)
+    } else {
+      setBlocks([{ id: generateUUID(), speakerId: 1, text: "" }])
+    }
   }
 
   // Only show speakers that are currently used in the blocks
@@ -83,7 +244,6 @@ export function StudioWorkspace({
 
   useEffect(() => {
     if (activeSpeakers.length > prevActiveSpeakersLengthRef.current) {
-      // Small timeout to allow React to mount the new speaker configuration card in the DOM
       setTimeout(() => {
         settingsScrollRef.current?.scrollTo({
           top: settingsScrollRef.current.scrollHeight,
@@ -94,13 +254,166 @@ export function StudioWorkspace({
     prevActiveSpeakersLengthRef.current = activeSpeakers.length
   }, [activeSpeakers.length])
 
+  // Audio Actions
+  const handleGenerate = async () => {
+    if (isGenerating) return
+
+    // Validation
+    if (activeTab === "text" && !singleText.trim()) {
+      toast.error(t("emptyTextError") || "Silakan masukkan teks terlebih dahulu.")
+      return
+    }
+
+    if (activeTab === "composer") {
+      const hasContent = blocks.some(b => b.text.trim().length > 0)
+      if (!hasContent) {
+        toast.error(t("emptyBlocksError") || "Silakan ketik teks di setidaknya satu blok dialog terlebih dahulu.")
+        return
+      }
+    }
+
+    // Stop current playback
+    if (audioRef.current) {
+      audioRef.current.pause()
+      setIsPlaying(false)
+    }
+
+    setIsGenerating(true)
+
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          activeTab,
+          text: singleText,
+          speakers,
+          blocks,
+          globalConfig,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Gagal memproduksi suara.")
+      }
+
+      const blob = await response.blob()
+      
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl)
+      }
+
+      const url = URL.createObjectURL(blob)
+      setAudioUrl(url)
+      setCurrentTime(0)
+      setProgress(0)
+
+      if (!audioRef.current) {
+        audioRef.current = new Audio()
+      }
+      audioRef.current.src = url
+      audioRef.current.load()
+
+      // Automatically play the generated audio
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch(err => {
+          console.warn("[Workspace] Autoplay prevented or interrupted:", err)
+        })
+
+    } catch (error: unknown) {
+      console.error("[Workspace] Generation failed:", error)
+      const message = error instanceof Error ? error.message : "Gagal melakukan generate audio."
+      toast.error(message)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handlePlayPauseToggle = () => {
+    const audio = audioRef.current
+    if (!audio || !audioUrl) return
+
+    if (isPlaying) {
+      audio.pause()
+      setIsPlaying(false)
+    } else {
+      audio.play()
+        .then(() => setIsPlaying(true))
+        .catch(err => {
+          console.error("Playback failed:", err)
+          toast.error("Gagal memutar audio.")
+        })
+    }
+  }
+
+  const handleSeek = (newProgress: number) => {
+    const audio = audioRef.current
+    if (!audio || !audio.duration) return
+
+    const newTime = (newProgress / 100) * audio.duration
+    audio.currentTime = newTime
+    setCurrentTime(newTime)
+    setProgress(newProgress)
+  }
+
+  const handleExport = useCallback(() => {
+    if (!audioUrl) {
+      toast.error(t("noAudioToExport") || "Silakan lakukan generate audio terlebih dahulu sebelum mengekspor.")
+      return
+    }
+
+    const link = document.createElement("a")
+    link.href = audioUrl
+
+    // Clean, formatted timestamp
+    const timestamp = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace(/[:T]/g, "-")
+    link.download = `t2s-${activeTab === "text" ? "narrator" : "podcast"}-${timestamp}.wav`
+
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast.success("File audio WAV berhasil diexport!")
+  }, [audioUrl, activeTab, t])
+
+  // Listen to export trigger from global layout header
+  useEffect(() => {
+    const handleTriggerExport = () => {
+      handleExport()
+    }
+    window.addEventListener("trigger-export", handleTriggerExport)
+    return () => {
+      window.removeEventListener("trigger-export", handleTriggerExport)
+    }
+  }, [handleExport])
+
+  // Time format utility (e.g. 1.25s -> "0:01", 62s -> "1:02")
+  const formatTime = (time: number) => {
+    if (isNaN(time) || !isFinite(time)) return "0:00"
+    const mins = Math.floor(time / 60)
+    const secs = Math.floor(time % 60)
+    return `${mins}:${secs.toString().padStart(2, "0")}`
+  }
+
+  const currentTimeStr = formatTime(currentTime)
+  const durationStr = formatTime(duration)
+
   return (
     <main className="flex flex-1 overflow-hidden h-full w-full">
       <section className="flex flex-1 flex-col overflow-hidden">
         <div className="flex flex-1 flex-col overflow-y-auto p-4">
           <Tabs
             value={activeTab}
-            onValueChange={setActiveTab}
+            onValueChange={(val) => {
+              setActiveTab(val)
+            }}
             className="flex flex-1 flex-col"
           >
             <div className="flex items-center justify-between">
@@ -173,7 +486,7 @@ export function StudioWorkspace({
               </div>
             </div>
             <TabsContent value="text" className="flex flex-1 flex-col">
-              <StudioEditor />
+              <StudioEditor value={singleText} onChange={handleTextChange} />
             </TabsContent>
             <TabsContent value="composer" className="">
               <StudioComposer
@@ -195,6 +508,15 @@ export function StudioWorkspace({
           <StudioControls
             generateText={t("generate")}
             generateTooltip={t("generateTooltip")}
+            isGenerating={isGenerating}
+            isPlaying={isPlaying}
+            onPlayPauseToggle={handlePlayPauseToggle}
+            progress={progress}
+            onSeek={handleSeek}
+            currentTimeStr={currentTimeStr}
+            durationStr={durationStr}
+            onGenerate={handleGenerate}
+            hasAudio={!!audioUrl}
           />
         </div>
       </section>
@@ -219,3 +541,4 @@ export function StudioWorkspace({
     </main>
   )
 }
+

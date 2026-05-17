@@ -16,7 +16,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-export function StudioEditor() {
+interface StudioEditorProps {
+  value: string
+  onChange: (val: string) => void
+}
+
+export function StudioEditor({ value, onChange }: StudioEditorProps) {
   const t = useTranslations("Studio")
 
   return (
@@ -27,6 +32,8 @@ export function StudioEditor() {
           placeholder={t("placeholder")}
           className="flex-1"
           aria-label={t("tabText")}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
         />
         <InputGroupAddon align="block-start" className="border-b">
           <InputGroupText>
