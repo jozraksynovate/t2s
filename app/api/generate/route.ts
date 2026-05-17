@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { GoogleGenAI } from "@google/genai"
 import { VOICE_DESCRIPTORS, type VoiceName } from "@/lib/studio"
 import { z } from "zod"
+import { adminAuth } from "@/lib/firebase-admin"
+
 
 interface SpeechConfig {
   voiceConfig?: {
@@ -93,7 +95,45 @@ function createWavHeader(dataLength: number, sampleRate: number = 24000): Buffer
 
 export async function POST(request: Request) {
   try {
-    const rawBody = await request.json()
+    // 1. Secure Endpoint Guard: Verify the client-side Firebase Auth ID token using Google ADC
+    const authHeader = request.headers.get("Authorization")
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        {
+          error: "Unauthorized",
+          message: "Akses ditolak. Token autentikasi tidak ditemukan."
+        },
+        { status: 401 }
+      )
+    }
+
+    const idToken = authHeader.substring(7)
+    try {
+      await adminAuth.verifyIdToken(idToken)
+    } catch (err) {
+      console.error("[T2S API] JWT Token verification failed:", err)
+      return NextResponse.json(
+        {
+          error: "Unauthorized",
+          message: "Akses ditolak. Token autentikasi tidak valid atau sudah kedaluwarsa."
+        },
+        { status: 401 }
+      )
+    }
+
+    let rawBody: any
+    try {
+      rawBody = await request.json()
+    } catch (err) {
+      return NextResponse.json(
+        {
+          error: "Malformed JSON",
+          message: "Format data permintaan tidak valid (JSON rusak)."
+        },
+        { status: 400 }
+      )
+    }
+
     const parseResult = generateSchema.safeParse(rawBody)
     
     if (!parseResult.success) {
@@ -373,12 +413,11 @@ export async function POST(request: Request) {
     })
 
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
     console.error("[T2S API] Unhandled generation exception:", error)
     return NextResponse.json(
       { 
         error: "Internal Server Error", 
-        message: `Terjadi kesalahan saat memproses permintaan: ${errorMessage}` 
+        message: "Terjadi kesalahan internal pada server saat memproses suara. Silakan coba beberapa saat lagi." 
       },
       { status: 500 }
     )

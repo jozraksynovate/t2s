@@ -4,10 +4,12 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { useTranslations } from "next-intl"
 import { Settings, Sparkles } from "lucide-react"
 import { toast } from "sonner"
+import { useAuth } from "@/hooks/use-auth"
 import { StudioEditor } from "./studio-editor"
 import { StudioComposer } from "./studio-composer"
 import { StudioControls } from "./studio-controls"
 import { StudioSettings } from "./studio-settings"
+import { SpeakerConfigForm } from "./speaker-config-form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { DEFAULT_SPEAKERS, type Speaker, type SpeechBlock } from "@/lib/studio"
@@ -29,10 +31,20 @@ export function StudioWorkspace({
   defaultSettingsOpen?: boolean
 }) {
   const t = useTranslations("Studio")
+  const { getFreshToken } = useAuth()
   const [activeTab, setActiveTab] = useState("text")
   const [activeSpeakerId, setActiveSpeakerId] = useState<number | null>(null)
-
   const [speakers, setSpeakers] = useState<Speaker[]>(DEFAULT_SPEAKERS)
+  const [cachedSpeaker, setCachedSpeaker] = useState<Speaker>(DEFAULT_SPEAKERS[0])
+
+  useEffect(() => {
+    if (activeSpeakerId !== null) {
+      const activeSpeaker = speakers.find((s) => s.id === activeSpeakerId)
+      if (activeSpeaker) {
+        setCachedSpeaker(activeSpeaker)
+      }
+    }
+  }, [activeSpeakerId, speakers])
   const [globalConfig, setGlobalConfig] = useState({
     scene: "",
     sampleContext: ""
@@ -281,10 +293,12 @@ export function StudioWorkspace({
     setIsGenerating(true)
 
     try {
+      const token = await getFreshToken()
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           activeTab,
@@ -296,8 +310,22 @@ export function StudioWorkspace({
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Gagal memproduksi suara.")
+        let errorMessage = "Gagal memproduksi suara."
+        const contentType = response.headers.get("Content-Type") || ""
+        if (contentType.includes("application/json")) {
+          try {
+            const errorData = await response.json()
+            errorMessage = errorData.message || errorMessage
+          } catch (e) {}
+        } else {
+          try {
+            const textError = await response.text()
+            if (textError && textError.length < 150) {
+              errorMessage = textError
+            }
+          } catch (e) {}
+        }
+        throw new Error(errorMessage)
       }
 
       const blob = await response.blob()
@@ -501,8 +529,6 @@ export function StudioWorkspace({
                 onUpdateBlock={updateBlock}
                 onConfigureSpeaker={(id) => {
                   setActiveSpeakerId(id)
-                  toggleSettings(true)
-                  setIsMobileSettingsOpen(true)
                 }}
               />
             </TabsContent>
@@ -543,6 +569,24 @@ export function StudioWorkspace({
           />
         </div>
       </aside>
+
+      <Drawer
+        direction="right"
+        open={activeSpeakerId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setActiveSpeakerId(null)
+          }
+        }}
+      >
+        <SpeakerConfigForm
+          speaker={speakers.find((s) => s.id === activeSpeakerId) || cachedSpeaker}
+          onUpdate={(updates) => {
+            const currentId = activeSpeakerId || cachedSpeaker.id
+            updateSpeaker(currentId, updates)
+          }}
+        />
+      </Drawer>
     </main>
   )
 }

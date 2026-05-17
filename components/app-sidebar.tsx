@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
+import { useAuth } from "@/hooks/use-auth"
 import {
   Sidebar,
   SidebarContent,
@@ -23,17 +24,15 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-}
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const t = useTranslations('Navigation');
+  const { user } = useAuth()
+
+  const userData = {
+    name: user?.displayName || user?.email?.split('@')[0] || "User",
+    email: user?.email || "",
+    avatar: user?.photoURL || "",
+  }
 
   const navMain = [
     {
@@ -95,7 +94,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

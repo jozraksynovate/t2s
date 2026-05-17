@@ -14,6 +14,8 @@ import {
 import { useTheme } from "next-themes"
 import { useTranslations, useLocale } from "next-intl"
 import { useRouter, usePathname } from "@/i18n/routing"
+import { useAuth } from "@/hooks/use-auth"
+import { toast } from "sonner"
 
 import {
   Avatar,
@@ -54,13 +56,36 @@ export function NavUser({
   const { isMobile } = useSidebar()
   const { theme, setTheme } = useTheme()
   const t = useTranslations('NavUser')
+  const authT = useTranslations('Auth')
   const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
+  const { logout } = useAuth()
 
   const handleLanguageChange = (nextLocale: string) => {
     router.replace(pathname, { locale: nextLocale })
   }
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      toast.success(authT('logoutSuccessToast'))
+      router.push("/login")
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to logout")
+    }
+  }
+
+  const getInitials = (name: string) => {
+    if (!name) return "U"
+    const parts = name.trim().split(/\s+/)
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return name.slice(0, 2).toUpperCase()
+  }
+
+  const initials = getInitials(user.name)
 
   return (
     <SidebarMenu>
@@ -73,7 +98,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -92,7 +117,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -165,7 +190,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               {t('logout')}
             </DropdownMenuItem>

@@ -1,0 +1,11 @@
+{
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "T2S",
+        "supportEmail": "nrasjp@gmail.com"
+      }
+    }
+  }
+}

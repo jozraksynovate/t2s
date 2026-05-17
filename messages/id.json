@@ -193,6 +193,15 @@
     "fullNamePlaceholder": "John Doe",
     "confirmPasswordLabel": "Konfirmasi Kata Sandi",
     "createAccountButton": "Buat Akun",
-    "signUpWithGoogle": "Daftar dengan Google"
+    "signUpWithGoogle": "Daftar dengan Google",
+    "authInvalidCredential": "Email atau kata sandi yang Anda masukkan salah.",
+    "authEmailAlreadyInUse": "Alamat email ini sudah terdaftar.",
+    "authWeakPassword": "Kata sandi terlalu lemah. Gunakan minimal 6 karakter.",
+    "authNetworkError": "Terjadi kesalahan jaringan. Periksa koneksi internet Anda.",
+    "authUnknownError": "Gagal: {error}",
+    "passwordMismatch": "Konfirmasi kata sandi tidak cocok.",
+    "loginSuccessToast": "Selamat datang kembali! Anda berhasil masuk.",
+    "signUpSuccessToast": "Akun Anda berhasil dibuat!",
+    "logoutSuccessToast": "Anda telah berhasil keluar dari sistem."
   }
 }

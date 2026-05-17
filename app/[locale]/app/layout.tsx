@@ -10,6 +10,8 @@ import { setRequestLocale } from 'next-intl/server';
 
 import { CommandMenu } from "@/components/command-menu"
 import { NewProjectDialog } from "@/components/new-project-dialog"
+import { AuthGuard } from "@/components/auth-guard"
+
 
 export default async function AppLayout({
   children,
@@ -25,16 +27,18 @@ export default async function AppLayout({
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false"
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar />
-      <SidebarInset className="flex h-screen flex-col overflow-hidden">
-        <AppHeader />
-        <div className="flex flex-1 flex-col overflow-hidden">
-          {children}
-        </div>
-      </SidebarInset>
-      <CommandMenu />
-      <NewProjectDialog showTrigger={false} />
-    </SidebarProvider>
+    <AuthGuard>
+      <SidebarProvider defaultOpen={defaultOpen}>
+        <AppSidebar />
+        <SidebarInset className="flex h-screen flex-col overflow-hidden">
+          <AppHeader />
+          <div className="flex flex-1 flex-col overflow-hidden">
+            {children}
+          </div>
+        </SidebarInset>
+        <CommandMenu />
+        <NewProjectDialog showTrigger={false} />
+      </SidebarProvider>
+    </AuthGuard>
   )
 }

@@ -193,6 +193,15 @@
     "fullNamePlaceholder": "John Doe",
     "confirmPasswordLabel": "Confirm Password",
     "createAccountButton": "Create Account",
-    "signUpWithGoogle": "Sign up with Google"
+    "signUpWithGoogle": "Sign up with Google",
+    "authInvalidCredential": "The email or password you entered is incorrect.",
+    "authEmailAlreadyInUse": "This email address is already registered.",
+    "authWeakPassword": "Password is too weak. Please use at least 6 characters.",
+    "authNetworkError": "Network error. Please check your internet connection.",
+    "authUnknownError": "Failed: {error}",
+    "passwordMismatch": "Confirm password does not match.",
+    "loginSuccessToast": "Welcome back! You have logged in successfully.",
+    "signUpSuccessToast": "Your account has been created successfully!",
+    "logoutSuccessToast": "You have been logged out successfully."
   }
 }

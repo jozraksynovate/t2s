@@ -29,14 +29,9 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item"
-import {
-  Drawer,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button"
 
 import { TTS_MODELS, type Speaker } from "@/lib/studio"
-import { SpeakerConfigForm } from "./speaker-config-form"
 
 interface StudioSettingsProps {
   mode: string
@@ -159,32 +154,15 @@ export function StudioSettings({
 
                   </ItemContent>
                   <ItemActions>
-                    <Drawer 
-                      direction="right"
-                      open={activeSpeakerId === speaker.id}
-                      onOpenChange={(open) => {
-                        if (open) {
-                          onConfigureSpeaker?.(speaker.id)
-                        } else {
-                          onConfigureSpeaker?.(null)
-                        }
-                      }}
+                    <Button
+                      size="icon-sm"
+                      variant="outline"
+                      className="rounded-full"
+                      aria-label={t("configureSpeaker", { name: speakerName })}
+                      onClick={() => onConfigureSpeaker?.(speaker.id)}
                     >
-                      <DrawerTrigger asChild>
-                        <Button
-                          size="icon-sm"
-                          variant="outline"
-                          className="rounded-full"
-                          aria-label={t("configureSpeaker", { name: speakerName })}
-                        >
-                          <Settings2 className="size-4" />
-                        </Button>
-                      </DrawerTrigger>
-                      <SpeakerConfigForm
-                        speaker={speaker}
-                        onUpdate={(updates) => onUpdateSpeaker(speaker.id, updates)}
-                      />
-                    </Drawer>
+                      <Settings2 className="size-4" />
+                    </Button>
                   </ItemActions>
 
                 </Item>

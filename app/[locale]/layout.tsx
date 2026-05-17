@@ -9,6 +9,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner"
+import { AuthProvider } from "@/hooks/use-auth"
+
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans', display: 'swap'})
 
@@ -113,8 +115,10 @@ export default async function RootLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
-            <TooltipProvider>{children}</TooltipProvider>
-            <Toaster />
+            <AuthProvider>
+              <TooltipProvider>{children}</TooltipProvider>
+              <Toaster />
+            </AuthProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
