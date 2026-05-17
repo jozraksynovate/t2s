@@ -47,9 +47,22 @@ export function SignupForm({
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
 
   const schema = React.useMemo(() => z.object({
-    name: z.string().min(1, t("nameRequired")),
-    email: z.string().min(1, t("emailRequired")).email(t("invalidEmail")),
-    password: z.string().min(1, t("passwordRequired")).min(6, t("passwordMinLength")),
+    name: z.string()
+      .min(1, t("nameRequired"))
+      .min(2, t("nameMinLength"))
+      .max(50, t("nameMaxLength")),
+    email: z.string()
+      .min(1, t("emailRequired"))
+      .email(t("invalidEmail"))
+      .max(255, t("emailMaxLength")),
+    password: z.string()
+      .min(1, t("passwordRequired"))
+      .min(8, t("passwordMinLength"))
+      .max(4096)
+      .regex(/[A-Z]/, t("passwordRequireUppercase"))
+      .regex(/[a-z]/, t("passwordRequireLowercase"))
+      .regex(/[0-9]/, t("passwordRequireNumeric"))
+      .regex(/[^A-Za-z0-9]/, t("passwordRequireSpecial")),
     confirmPassword: z.string().min(1, t("confirmPasswordRequired")),
   }).refine((data) => data.password === data.confirmPassword, {
     message: t("passwordMismatch"),
@@ -58,6 +71,7 @@ export function SignupForm({
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(schema),
+    mode: "onTouched",
     defaultValues: {
       name: "",
       email: "",
@@ -65,6 +79,29 @@ export function SignupForm({
       confirmPassword: "",
     },
   })
+
+  const passwordValue = form.watch("password") || ""
+  const checks = React.useMemo(() => {
+    return {
+      minLength: passwordValue.length >= 8,
+      hasUppercase: /[A-Z]/.test(passwordValue),
+      hasLowercase: /[a-z]/.test(passwordValue),
+      hasNumber: /[0-9]/.test(passwordValue),
+      hasSpecial: /[^A-Za-z0-9]/.test(passwordValue),
+    }
+  }, [passwordValue])
+
+  const getPasswordHint = () => {
+    if (!passwordValue) {
+      return t("passwordCritLength")
+    }
+    if (!checks.minLength) return t("passwordCritLength")
+    if (!checks.hasUppercase) return t("passwordCritUppercase")
+    if (!checks.hasLowercase) return t("passwordCritLowercase")
+    if (!checks.hasNumber) return t("passwordCritNumeric")
+    if (!checks.hasSpecial) return t("passwordCritSpecial")
+    return null
+  }
 
   const handleAuthError = (err: unknown) => {
     const errorObj = err as { code?: string; message?: string } | null | undefined
@@ -166,15 +203,18 @@ export function SignupForm({
                 <FieldError>{form.formState.errors.email.message}</FieldError>
               )}
             </Field>
-            <Field data-invalid={!!form.formState.errors.password}>
+            <Field data-invalid={!!form.formState.errors.password || (passwordValue.length > 0 && getPasswordHint() !== null)}>
               <FieldLabel htmlFor="password">{t("passwordLabel")}</FieldLabel>
               <Input
                 id="password"
                 type="password"
                 {...form.register("password")}
-                aria-invalid={!!form.formState.errors.password}
+                aria-invalid={!!form.formState.errors.password || (passwordValue.length > 0 && getPasswordHint() !== null)}
                 disabled={isAnyLoading}
               />
+              {passwordValue.length > 0 && getPasswordHint() && !form.formState.errors.password && (
+                <FieldError>{getPasswordHint()}</FieldError>
+              )}
               {form.formState.errors.password && (
                 <FieldError>{form.formState.errors.password.message}</FieldError>
               )}

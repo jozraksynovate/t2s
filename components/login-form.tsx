@@ -47,14 +47,16 @@ export function LoginForm({
   const schema = React.useMemo(() => z.object({
     email: z.string()
       .min(1, t("emailRequired"))
-      .email(t("invalidEmail")),
+      .email(t("invalidEmail"))
+      .max(255, t("emailMaxLength")),
     password: z.string()
       .min(1, t("passwordRequired"))
-      .min(6, t("passwordMinLength")),
+      .min(8, t("passwordMinLength")),
   }), [t])
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(schema),
+    mode: "onTouched",
     defaultValues: {
       email: "",
       password: "",
