@@ -44,7 +44,7 @@ export async function generateMetadata({
 
   return {
     title: {
-      template: `%s | ${t('title')}`,
+      template: "%s | T2S",
       default: t('title')
     },
     description: t('description'),

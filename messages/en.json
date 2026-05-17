@@ -28,7 +28,9 @@
     "description": "The most advanced platform for your digital needs.",
     "home": "Home | T2S",
     "studio": "Studio | T2S",
-    "billing": "Billing | T2S"
+    "billing": "Billing | T2S",
+    "login": "Login",
+    "signup": "Sign Up"
   },
   "ProjectItem": {
     "share": "Share",
@@ -173,5 +175,24 @@
       "Sadaltager": "Knowledgeable",
       "Sulafat": "Warm"
     }
+  },
+  "Auth": {
+    "loginTitle": "Login to your account",
+    "loginDescription": "Enter your email below to login to your account",
+    "signUpLinkAction": "Sign Up",
+    "emailLabel": "Email",
+    "emailPlaceholder": "m@example.com",
+    "passwordLabel": "Password",
+    "forgotPassword": "Forgot your password?",
+    "loginButton": "Login",
+    "loginWithGoogle": "Login with Google",
+    "signUpTitle": "Create an account",
+    "signUpDescription": "Enter your information below to create your account",
+    "loginLinkAction": "Login",
+    "fullNameLabel": "Full Name",
+    "fullNamePlaceholder": "John Doe",
+    "confirmPasswordLabel": "Confirm Password",
+    "createAccountButton": "Create Account",
+    "signUpWithGoogle": "Sign up with Google"
   }
 }

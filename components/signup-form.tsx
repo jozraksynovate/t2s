@@ -18,12 +18,14 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Link, useRouter } from "@/i18n/routing"
+import { useTranslations } from "next-intl"
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const router = useRouter()
+  const t = useTranslations("Auth")
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,47 +40,47 @@ export function SignupForm({
     >
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Create an account</CardTitle>
+          <CardTitle>{t("signUpTitle")}</CardTitle>
           <CardDescription>
-            Enter your information below to create your account
+            {t("signUpDescription")}
           </CardDescription>
           <CardAction>
             <Button variant="link" asChild>
-              <Link href="/login">Login</Link>
+              <Link href="/login">{t("loginLinkAction")}</Link>
             </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input id="name" type="text" placeholder="John Doe" required />
+              <FieldLabel htmlFor="name">{t("fullNameLabel")}</FieldLabel>
+              <Input id="name" type="text" placeholder={t("fullNamePlaceholder")} required />
             </Field>
             <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <FieldLabel htmlFor="email">{t("emailLabel")}</FieldLabel>
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder={t("emailPlaceholder")}
                 required
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <FieldLabel htmlFor="password">{t("passwordLabel")}</FieldLabel>
               <Input id="password" type="password" required />
             </Field>
             <Field>
-              <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+              <FieldLabel htmlFor="confirm-password">{t("confirmPasswordLabel")}</FieldLabel>
               <Input id="confirm-password" type="password" required />
             </Field>
           </FieldGroup>
         </CardContent>
         <CardFooter className="flex-col gap-2">
           <Button type="submit" className="w-full">
-            Create Account
+            {t("createAccountButton")}
           </Button>
           <Button onClick={() => router.push("/app")} type="button" variant="outline" className="w-full">
-            Sign up with Google
+            {t("signUpWithGoogle")}
           </Button>
         </CardFooter>
       </Card>

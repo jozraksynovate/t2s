@@ -28,7 +28,9 @@
     "description": "Platform tercanggih untuk kebutuhan digital Anda.",
     "home": "Beranda | T2S",
     "studio": "Studio | T2S",
-    "billing": "Tagihan | T2S"
+    "billing": "Tagihan | T2S",
+    "login": "Masuk",
+    "signup": "Daftar"
   },
   "ProjectItem": {
     "share": "Bagikan",
@@ -173,5 +175,24 @@
       "Sadaltager": "Berwawasan",
       "Sulafat": "Hangat"
     }
+  },
+  "Auth": {
+    "loginTitle": "Masuk ke akun Anda",
+    "loginDescription": "Masukkan email Anda di bawah untuk masuk ke akun Anda",
+    "signUpLinkAction": "Daftar",
+    "emailLabel": "Email",
+    "emailPlaceholder": "m@example.com",
+    "passwordLabel": "Kata Sandi",
+    "forgotPassword": "Lupa kata sandi Anda?",
+    "loginButton": "Masuk",
+    "loginWithGoogle": "Masuk dengan Google",
+    "signUpTitle": "Buat akun baru",
+    "signUpDescription": "Masukkan informasi Anda di bawah untuk membuat akun baru",
+    "loginLinkAction": "Masuk",
+    "fullNameLabel": "Nama Lengkap",
+    "fullNamePlaceholder": "John Doe",
+    "confirmPasswordLabel": "Konfirmasi Kata Sandi",
+    "createAccountButton": "Buat Akun",
+    "signUpWithGoogle": "Daftar dengan Google"
   }
 }
