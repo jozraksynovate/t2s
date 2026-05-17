@@ -1,6 +1,9 @@
 "use client"
 
 import React, { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,6 +17,7 @@ import {
 } from "@/components/ui/card"
 import {
   Field,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
@@ -24,6 +28,13 @@ import { useAuth } from "@/hooks/use-auth"
 import { toast } from "sonner"
 import { Spinner } from "@/components/ui/spinner"
 
+interface SignupFormValues {
+  name: string
+  email: string
+  password: string
+  confirmPassword: string
+}
+
 export function SignupForm({
   className,
   ...props
@@ -32,15 +43,32 @@ export function SignupForm({
   const t = useTranslations("Auth")
   const { signUpWithEmail, signInWithGoogle } = useAuth()
 
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
 
-  const handleAuthError = (err: any) => {
-    const code = err?.code || ""
+  const schema = React.useMemo(() => z.object({
+    name: z.string().min(1, t("nameRequired")),
+    email: z.string().min(1, t("emailRequired")).email(t("invalidEmail")),
+    password: z.string().min(1, t("passwordRequired")).min(6, t("passwordMinLength")),
+    confirmPassword: z.string().min(1, t("confirmPasswordRequired")),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t("passwordMismatch"),
+    path: ["confirmPassword"],
+  }), [t])
+
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  })
+
+  const handleAuthError = (err: unknown) => {
+    const errorObj = err as { code?: string; message?: string } | null | undefined
+    const code = errorObj?.code || ""
     let message = ""
     if (
       code === "auth/invalid-credential" ||
@@ -55,23 +83,17 @@ export function SignupForm({
     } else if (code === "auth/network-request-failed") {
       message = t("authNetworkError")
     } else {
-      message = t("authUnknownError", { error: err?.message || String(err) })
+      message = t("authUnknownError", { error: errorObj?.message || String(err) })
     }
     toast.error(message)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (values: SignupFormValues) => {
     if (isSubmitting || isGoogleSubmitting) return
-
-    if (password !== confirmPassword) {
-      toast.warning(t("passwordMismatch"))
-      return
-    }
 
     setIsSubmitting(true)
     try {
-      await signUpWithEmail(name, email, password)
+      await signUpWithEmail(values.name, values.email, values.password)
       toast.success(t("signUpSuccessToast"))
       router.push("/app")
     } catch (err) {
@@ -100,7 +122,7 @@ export function SignupForm({
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={form.handleSubmit(onSubmit)}
       className={cn("flex flex-col gap-6 w-full max-w-sm", className)}
       {...props}
     >
@@ -116,53 +138,61 @@ export function SignupForm({
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <Field>
+            <Field data-invalid={!!form.formState.errors.name}>
               <FieldLabel htmlFor="name">{t("fullNameLabel")}</FieldLabel>
               <Input
                 id="name"
                 type="text"
                 placeholder={t("fullNamePlaceholder")}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                {...form.register("name")}
+                aria-invalid={!!form.formState.errors.name}
                 disabled={isAnyLoading}
-                required
               />
+              {form.formState.errors.name && (
+                <FieldError>{form.formState.errors.name.message}</FieldError>
+              )}
             </Field>
-            <Field>
+            <Field data-invalid={!!form.formState.errors.email}>
               <FieldLabel htmlFor="email">{t("emailLabel")}</FieldLabel>
               <Input
                 id="email"
                 type="email"
                 placeholder={t("emailPlaceholder")}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...form.register("email")}
+                aria-invalid={!!form.formState.errors.email}
                 disabled={isAnyLoading}
-                required
               />
+              {form.formState.errors.email && (
+                <FieldError>{form.formState.errors.email.message}</FieldError>
+              )}
             </Field>
-            <Field>
+            <Field data-invalid={!!form.formState.errors.password}>
               <FieldLabel htmlFor="password">{t("passwordLabel")}</FieldLabel>
               <Input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...form.register("password")}
+                aria-invalid={!!form.formState.errors.password}
                 disabled={isAnyLoading}
-                required
               />
+              {form.formState.errors.password && (
+                <FieldError>{form.formState.errors.password.message}</FieldError>
+              )}
             </Field>
-            <Field>
+            <Field data-invalid={!!form.formState.errors.confirmPassword}>
               <FieldLabel htmlFor="confirm-password">
                 {t("confirmPasswordLabel")}
               </FieldLabel>
               <Input
                 id="confirm-password"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                {...form.register("confirmPassword")}
+                aria-invalid={!!form.formState.errors.confirmPassword}
                 disabled={isAnyLoading}
-                required
               />
+              {form.formState.errors.confirmPassword && (
+                <FieldError>{form.formState.errors.confirmPassword.message}</FieldError>
+              )}
             </Field>
           </FieldGroup>
         </CardContent>

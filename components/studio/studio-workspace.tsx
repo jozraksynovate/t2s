@@ -37,14 +37,10 @@ export function StudioWorkspace({
   const [speakers, setSpeakers] = useState<Speaker[]>(DEFAULT_SPEAKERS)
   const [cachedSpeaker, setCachedSpeaker] = useState<Speaker>(DEFAULT_SPEAKERS[0])
 
-  useEffect(() => {
-    if (activeSpeakerId !== null) {
-      const activeSpeaker = speakers.find((s) => s.id === activeSpeakerId)
-      if (activeSpeaker) {
-        setCachedSpeaker(activeSpeaker)
-      }
-    }
-  }, [activeSpeakerId, speakers])
+  const activeSpeaker = activeSpeakerId !== null ? speakers.find((s) => s.id === activeSpeakerId) : null
+  if (activeSpeaker && cachedSpeaker !== activeSpeaker) {
+    setCachedSpeaker(activeSpeaker)
+  }
   const [globalConfig, setGlobalConfig] = useState({
     scene: "",
     sampleContext: ""
@@ -316,14 +312,14 @@ export function StudioWorkspace({
           try {
             const errorData = await response.json()
             errorMessage = errorData.message || errorMessage
-          } catch (e) {}
+          } catch {}
         } else {
           try {
             const textError = await response.text()
             if (textError && textError.length < 150) {
               errorMessage = textError
             }
-          } catch (e) {}
+          } catch {}
         }
         throw new Error(errorMessage)
       }

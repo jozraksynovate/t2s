@@ -121,10 +121,10 @@ export async function POST(request: Request) {
       )
     }
 
-    let rawBody: any
+    let rawBody: unknown
     try {
       rawBody = await request.json()
-    } catch (err) {
+    } catch {
       return NextResponse.json(
         {
           error: "Malformed JSON",

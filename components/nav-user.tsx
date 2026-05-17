@@ -71,8 +71,9 @@ export function NavUser({
       await logout()
       toast.success(authT('logoutSuccessToast'))
       router.push("/login")
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to logout")
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to logout"
+      toast.error(message)
     }
   }
 
