@@ -24,7 +24,6 @@ import { Button } from "@/components/ui/button"
 
 import { type Speaker, type SpeechBlock } from "@/lib/studio"
 
-
 interface StudioComposerProps {
   speakers: Speaker[]
   blocks: SpeechBlock[]
@@ -51,7 +50,6 @@ export function StudioComposer({
       lastBlockRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
     }
   }, [blocks.length])
-
 
   return (
     <div className="flex w-full flex-col gap-4">

@@ -36,8 +36,7 @@ import {
 import { Button } from "@/components/ui/button"
 
 import { TTS_MODELS, type Speaker } from "@/lib/studio"
-import { SpeakerConfigForm } from "@/components/speaker-config-form"
-
+import { SpeakerConfigForm } from "./speaker-config-form"
 
 interface StudioSettingsProps {
   mode: string
@@ -108,7 +107,6 @@ export function StudioSettings({
         </FieldGroup>
       </FieldSet>
 
-
       <FieldSeparator />
 
       <FieldSet>
@@ -139,8 +137,6 @@ export function StudioSettings({
 
         </FieldGroup>
       </FieldSet>
-
-
 
       <FieldSeparator />
 

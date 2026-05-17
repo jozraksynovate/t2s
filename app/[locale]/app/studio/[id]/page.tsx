@@ -1,6 +1,6 @@
 import { setRequestLocale } from 'next-intl/server';
 import { projects } from '@/lib/data';
-import { StudioWorkspace } from '@/components/studio-workspace';
+import { StudioWorkspace } from '@/components/studio/studio-workspace';
 
 export async function generateMetadata({
   params,

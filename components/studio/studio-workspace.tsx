@@ -3,17 +3,15 @@
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { Copy } from "lucide-react"
-import { StudioEditor } from "@/components/studio-editor"
-import { StudioComposer } from "@/components/studio-composer"
-import { StudioAudioPlayer } from "@/components/studio-audio-player"
-import { StudioGenerateFooter } from "@/components/studio-generate-footer"
-import { StudioSettings } from "@/components/studio-settings"
+import { StudioEditor } from "./studio-editor"
+import { StudioComposer } from "./studio-composer"
+import { StudioControls } from "./studio-controls"
+import { StudioSettings } from "./studio-settings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { DEFAULT_SPEAKERS, type Speaker, type SpeechBlock } from "@/lib/studio"
 
 export function StudioWorkspace() {
-
   const t = useTranslations("Studio")
   const [activeTab, setActiveTab] = useState("text")
   const [activeSpeakerId, setActiveSpeakerId] = useState<number | null>(null)
@@ -34,7 +32,6 @@ export function StudioWorkspace() {
   const updateGlobalConfig = (updates: Partial<typeof globalConfig>) => {
     setGlobalConfig(prev => ({ ...prev, ...updates }))
   }
-
 
   const addBlock = () => {
     const lastBlock = blocks[blocks.length - 1]
@@ -59,8 +56,6 @@ export function StudioWorkspace() {
   const activeSpeakers = speakers.filter(speaker => 
     blocks.some(block => block.speakerId === speaker.id)
   )
-
-
 
   return (
     <main className="flex flex-1 overflow-hidden h-full">
@@ -96,8 +91,7 @@ export function StudioWorkspace() {
           </Tabs>
         </div>
         <div className="border-t p-4 flex items-center gap-4">
-          <StudioAudioPlayer />
-          <StudioGenerateFooter 
+          <StudioControls 
             generateText={t("generate")} 
             generateTooltip={t("generateTooltip")} 
           />
@@ -115,9 +109,6 @@ export function StudioWorkspace() {
           onConfigureSpeaker={setActiveSpeakerId}
         />
       </aside>
-
-
     </main>
   )
 }
-

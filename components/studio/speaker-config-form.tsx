@@ -164,7 +164,6 @@ export function SpeakerConfigForm({ speaker, onUpdate }: SpeakerConfigFormProps)
       </div>
 
       <DrawerFooter>
-
         <DrawerClose asChild>
           <Button variant="outline" className="w-full">
             {t("close")}
