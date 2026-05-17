@@ -36,9 +36,9 @@ export function AppHeader() {
       <SidebarTrigger className="-ml-1" />
       <Separator
         orientation="vertical"
-        className="mr-2 data-vertical:h-4 data-vertical:self-auto"
+        className="mr-2 data-vertical:h-4 data-vertical:self-auto hidden md:block"
       />
-      <Breadcrumb>
+      <Breadcrumb className="hidden md:block">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>

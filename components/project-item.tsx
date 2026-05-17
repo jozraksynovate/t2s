@@ -62,6 +62,7 @@ export function ProjectItem({ title, description }: ProjectItemProps) {
   const [open, setOpen] = React.useState(false)
   const [renameOpen, setRenameOpen] = React.useState(false)
   const [deleteOpen, setDeleteOpen] = React.useState(false)
+  const [menuOpen, setMenuOpen] = React.useState(false)
   const t = useTranslations('ProjectItem')
   const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/app/studio/linkproject` : ''
 
@@ -117,12 +118,16 @@ export function ProjectItem({ title, description }: ProjectItemProps) {
             <ItemDescription className="line-clamp-1">{description}</ItemDescription>
           </ItemContent>
           <ItemActions>
-            <DropdownMenu>
+            <DropdownMenu onOpenChange={setMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="size-8 rounded-full"
+                  className={`size-8 rounded-full transition-opacity duration-150 ${
+                    menuOpen 
+                      ? "opacity-100" 
+                      : "opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/item:opacity-100 focus-visible:opacity-100"
+                  }`}
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()

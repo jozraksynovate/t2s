@@ -11,7 +11,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { DEFAULT_SPEAKERS, type Speaker, type SpeechBlock } from "@/lib/studio"
 
-export function StudioWorkspace() {
+export function StudioWorkspace({
+  defaultSettingsOpen = true
+}: {
+  defaultSettingsOpen?: boolean
+}) {
   const t = useTranslations("Studio")
   const [activeTab, setActiveTab] = useState("text")
   const [activeSpeakerId, setActiveSpeakerId] = useState<number | null>(null)
@@ -24,7 +28,12 @@ export function StudioWorkspace() {
   const [blocks, setBlocks] = useState<SpeechBlock[]>([
     { id: crypto.randomUUID(), speakerId: 1, text: "" },
   ])
-  const [isSettingsOpen, setIsSettingsOpen] = useState(true)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(defaultSettingsOpen)
+
+  const toggleSettings = (open: boolean) => {
+    setIsSettingsOpen(open)
+    document.cookie = `studio_settings_open=${open}; path=/; max-age=${60 * 60 * 24 * 7}; path=/`
+  }
 
   const updateSpeaker = (id: number, updates: Partial<Speaker>) => {
     setSpeakers(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s))
@@ -99,7 +108,7 @@ export function StudioWorkspace() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                  onClick={() => toggleSettings(!isSettingsOpen)}
                   aria-label={t("toggleSettings")}
                 >
                   <Settings aria-hidden="true" />
@@ -118,7 +127,7 @@ export function StudioWorkspace() {
                 onUpdateBlock={updateBlock}
                 onConfigureSpeaker={(id) => {
                   setActiveSpeakerId(id)
-                  setIsSettingsOpen(true)
+                  toggleSettings(true)
                 }}
               />
             </TabsContent>

@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { setRequestLocale } from 'next-intl/server';
 import { projects } from '@/lib/data';
 import { StudioWorkspace } from '@/components/studio/studio-workspace';
@@ -31,5 +32,8 @@ export default async function ProjectStudioPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <StudioWorkspace />
+  const cookieStore = await cookies();
+  const defaultSettingsOpen = cookieStore.get("studio_settings_open")?.value !== "false";
+
+  return <StudioWorkspace defaultSettingsOpen={defaultSettingsOpen} />
 }

@@ -91,7 +91,7 @@ export function StudioComposer({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <InputGroupButton 
-                      className="ml-auto opacity-0 group-hover/input-group:opacity-100 focus-visible:opacity-100 transition-opacity" 
+                      className="ml-auto opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/input-group:opacity-100 focus-visible:opacity-100 transition-opacity" 
                       variant="outline"
                       size="icon-sm"
                       aria-label={t("speechToTextTooltip")}
@@ -105,7 +105,7 @@ export function StudioComposer({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <InputGroupButton 
-                      className="opacity-0 group-hover/input-group:opacity-100 focus-visible:opacity-100 transition-opacity"
+                      className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/input-group:opacity-100 focus-visible:opacity-100 transition-opacity"
                       variant="ghost" 
                       size="icon-sm"
                       aria-label={t("deleteTooltip")}
