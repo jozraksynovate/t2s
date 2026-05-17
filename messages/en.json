@@ -95,6 +95,7 @@
     "copy": "Copy",
     "toggleSettings": "Toggle configuration panel",
     "generate": "Generate",
+    "generating": "Generating...",
     "playTooltip": "Play/Pause",
     "generateTooltip": "Generate audio",
     "config": "Studio Configuration",

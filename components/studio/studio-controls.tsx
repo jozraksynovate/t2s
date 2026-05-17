@@ -129,7 +129,7 @@ export function StudioControls({
               {isGenerating ? (
                 <>
                   <Spinner />
-                  <span>Generating...</span>
+                  <span>{t("generating")}</span>
                 </>
               ) : (
                 <span>{generateText}</span>

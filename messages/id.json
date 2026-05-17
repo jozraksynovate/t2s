@@ -95,6 +95,7 @@
     "copy": "Salin",
     "toggleSettings": "Tampilkan/Sembunyikan panel konfigurasi",
     "generate": "Hasilkan",
+    "generating": "Menghasilkan...",
     "playTooltip": "Putar/Jeda",
     "generateTooltip": "Hasilkan audio",
     "config": "Konfigurasi Studio",
