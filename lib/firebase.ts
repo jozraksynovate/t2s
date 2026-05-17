@@ -49,5 +49,23 @@ try {
   app = getApps().length > 0 ? getApp() : initializeApp({ apiKey: "AIzaSyMockAPIKeyForNextJSBuildTimeOnly", projectId: "mock-project-id" })
 }
 
-export const auth = getAuth(app)
+// Mencegah crash jika inisialisasi getAuth gagal akibat kunci API tidak valid saat build-time
+export const auth = (() => {
+  try {
+    return getAuth(app)
+  } catch (error) {
+    if (typeof window !== "undefined") {
+      console.error("[Firebase Client] Failed to retrieve Auth service instance:", error)
+    }
+    // Mengembalikan objek Auth mock agar proses kompilasi Next.js tidak crash
+    return {
+      currentUser: null,
+      onAuthStateChanged: (callback: any) => {
+        // Mengembalikan fungsi unsubscribe dummy
+        return () => {}
+      },
+    } as unknown as ReturnType<typeof getAuth>
+  }
+})()
+
 export const googleProvider = new GoogleAuthProvider()
