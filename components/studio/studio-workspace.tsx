@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useTranslations } from "next-intl"
+import { useRouter } from "@/i18n/routing"
 import { Settings, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/use-auth"
@@ -18,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { DEFAULT_SPEAKERS, type Speaker, type SpeechBlock } from "@/lib/studio"
 import { generateUUID } from "@/lib/utils"
+import { TopupDialog } from "@/components/topup-dialog"
 import {
   Drawer,
   DrawerContent,
@@ -35,6 +37,8 @@ export function StudioWorkspace({
   defaultSettingsOpen?: boolean
 }) {
   const t = useTranslations("Studio")
+  const tBilling = useTranslations("Billing")
+  const router = useRouter()
   const { getFreshToken, user } = useAuth()
   const params = useParams()
   const projectId = params?.id as string
@@ -441,20 +445,31 @@ export function StudioWorkspace({
 
       if (!response.ok) {
         let errorMessage = "Gagal memproduksi suara."
+        let errorCode = ""
         const contentType = response.headers.get("Content-Type") || ""
+        
         if (contentType.includes("application/json")) {
           try {
             const errorData = await response.json()
             errorMessage = errorData.message || errorMessage
-          } catch { }
-        } else {
-          try {
-            const textError = await response.text()
-            if (textError && textError.length < 150) {
-              errorMessage = textError
-            }
+            errorCode = errorData.error || ""
           } catch { }
         }
+
+        // Special handling for insufficient credits (402)
+        if (response.status === 402 || errorCode === "INSUFFICIENT_CREDITS") {
+          toast(errorMessage, {
+            action: (
+              <TopupDialog>
+                <Button size="sm" variant="outline" className="h-8">
+                  Top Up
+                </Button>
+              </TopupDialog>
+            ),
+          })
+          return
+        }
+
         throw new Error(errorMessage)
       }
 

@@ -1,9 +1,47 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // Function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Function to check if user is the owner of the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
     match /projects/{projectId} {
-      allow read, write, delete: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      // Users can only read and delete their own projects
+      allow read, delete: if isOwner(resource.data.userId);
+      
+      // Ownership and basic validation on creation
+      allow create: if isOwner(request.resource.data.userId)
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() > 0
+                    && request.resource.data.title.size() <= 200;
+      
+      // Ownership must not change on update, and basic validation
+      allow update: if isOwner(resource.data.userId)
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() > 0
+                    && request.resource.data.title.size() <= 200;
+    }
+
+    match /users/{userId} {
+      // Users can only read their own profile (credits, etc.)
+      allow read: if isOwner(userId);
+      // Only Admin SDK (server-side) can update user profile
+      allow write: if false;
+    }
+
+    match /transactions/{transactionId} {
+      // Users can only read their own transaction history
+      allow read: if isOwner(resource.data.userId);
+      // Transactions are immutable and created by server-side logic only
+      allow write: if false;
     }
   }
 }

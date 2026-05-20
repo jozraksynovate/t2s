@@ -128,7 +128,7 @@ export function getUserProjects(
   const q = query(
     collection(db, COLLECTION_NAME),
     where("userId", "==", userId),
-    orderBy("createdAt", "desc")
+    orderBy("updatedAt", "desc")
   )
 
   const unsubscribe = onSnapshot(
@@ -145,6 +145,52 @@ export function getUserProjects(
     },
     (error) => {
       console.error("Error in real-time user projects subscription:", error)
+    }
+  )
+
+  return unsubscribe
+}
+
+export interface Transaction {
+  id: string
+  userId: string
+  type: "purchase" | "usage" | "refund"
+  status?: "pending" | "success" | "failed"
+  amount: number
+  priceInIdr?: number
+  invoiceNumber?: string
+  metadata?: any
+  createdAt: any
+  completedAt?: any
+}
+
+/**
+ * Subscribes to real-time updates for a user's transaction history.
+ */
+export function getUserTransactions(
+  userId: string,
+  callback: (transactions: Transaction[]) => void
+): () => void {
+  const q = query(
+    collection(db, "transactions"),
+    where("userId", "==", userId),
+    orderBy("createdAt", "desc")
+  )
+
+  const unsubscribe = onSnapshot(
+    q,
+    (querySnapshot: QuerySnapshot<DocumentData>) => {
+      const transactions: Transaction[] = []
+      querySnapshot.forEach((doc) => {
+        transactions.push({
+          id: doc.id,
+          ...doc.data()
+        } as Transaction)
+      })
+      callback(transactions)
+    },
+    (error) => {
+      console.error("Error in real-time user transactions subscription:", error)
     }
   )
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { Link } from "@/i18n/routing"
-import { useTranslations } from "next-intl"
+import { useTranslations, useFormatter } from "next-intl"
 import { usePathname } from "@/i18n/routing"
 import {
   Breadcrumb,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
@@ -23,10 +24,16 @@ import {
 } from "@/components/ui/tooltip"
 import { useSearchParams } from "next/navigation"
 import React from "react"
+import { useAuth } from "@/hooks/use-auth"
+import { CREDIT_CONSTANTS } from "@/lib/data"
+import { TopupDialog } from "@/components/topup-dialog"
 
 export function AppHeader() {
   const pathname = usePathname()
+  const { userData, loading: authLoading } = useAuth()
+  const format = useFormatter()
   const t = useTranslations('Navigation')
+  const tNavUser = useTranslations('NavUser')
   const tNew = useTranslations('NewProject')
   const tStudio = useTranslations('Studio')
   const searchParams = useSearchParams()
@@ -49,6 +56,9 @@ export function AppHeader() {
   // With next-intl's usePathname, the locale is already stripped.
   // Example: /app/studio (even if the URL is /en/app/studio)
   const pathSegments = pathname.split("/").filter(Boolean)
+
+  const credits = userData?.credits ?? 0
+  const isLongCredits = credits >= CREDIT_CONSTANTS.COMPACT_THRESHOLD
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -111,6 +121,21 @@ export function AppHeader() {
         )}
         {pathSegments.length >= 3 && pathSegments[0] === "app" && pathSegments[1] === "studio" && (
           <>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <TopupDialog>
+                  <Button variant="ghost" className="px-2 font-medium">
+                    {isLongCredits 
+                      ? format.number(credits, { notation: 'compact', compactDisplay: 'short' }) 
+                      : format.number(credits)}
+                  </Button>
+                </TopupDialog>
+              </TooltipTrigger>
+              <TooltipContent>
+                {tNavUser('creditsTooltip', { count: format.number(credits) })}
+              </TooltipContent>
+            </Tooltip>
+            
             <Button variant="outline">
               {tStudio('docs')}
             </Button>

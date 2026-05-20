@@ -12,6 +12,8 @@
   },
   "NavUser": {
     "upgrade": "Tingkatkan ke Pro",
+    "credits": "Saldo: {count} kredit",
+    "creditsTooltip": "Sisa {count} karakter",
     "account": "Akun",
     "theme": "Tema",
     "themeLight": "Terang",
@@ -228,6 +230,18 @@
     "loginSuccessToast": "Selamat datang kembali! Anda berhasil masuk.",
     "signUpSuccessToast": "Akun Anda berhasil dibuat!",
     "logoutSuccessToast": "Anda telah berhasil keluar dari sistem."
+  },
+  "Billing": {
+    "title": "Top Up Saldo",
+    "description": "Beli lebih banyak karakter untuk melanjutkan pembuatan suara berkualitas tinggi.",
+    "amountLabel": "Jumlah Karakter",
+    "amountPlaceholder": "Masukkan jumlah (min 100.000)",
+    "submit": "Beli",
+    "totalLabel": "Total Harga",
+    "processing": "Memproses...",
+    "success": "Berhasil menambahkan {amount} karakter!",
+    "error": "Gagal memproses top up. Silakan coba lagi.",
+    "minError": "Minimal top up adalah 100.000 karakter."
   },
   "EmptyState": {
     "title": "Belum Ada Proyek",

@@ -10,10 +10,17 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth"
-import { auth, googleProvider } from "@/lib/firebase"
+import { doc, onSnapshot } from "firebase/firestore"
+import { auth, googleProvider, db } from "@/lib/firebase"
+
+interface UserData {
+  credits: number
+  updatedAt?: any
+}
 
 interface AuthContextType {
   user: User | null
+  userData: UserData | null
   loading: boolean
   signInWithEmail: (email: string, password: string) => Promise<User>
   signUpWithEmail: (name: string, email: string, password: string) => Promise<User>
@@ -26,15 +33,41 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [userData, setUserData] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    let unsubscribeFirestore: (() => void) | undefined
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser)
+      
+      if (firebaseUser) {
+        // Listen to user document for credits and other metadata
+        const userDocRef = doc(db, "users", firebaseUser.uid)
+        unsubscribeFirestore = onSnapshot(userDocRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUserData(docSnap.data() as UserData)
+          } else {
+            setUserData(null)
+          }
+        }, (error) => {
+          console.error("Error listening to user data:", error)
+        })
+      } else {
+        setUserData(null)
+        if (unsubscribeFirestore) {
+          unsubscribeFirestore()
+        }
+      }
+      
       setLoading(false)
     })
 
-    return () => unsubscribe()
+    return () => {
+      unsubscribeAuth()
+      if (unsubscribeFirestore) unsubscribeFirestore()
+    }
   }, [])
 
   const signInWithEmail = async (email: string, password: string) => {
@@ -94,6 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        userData,
         loading,
         signInWithEmail,
         signUpWithEmail,

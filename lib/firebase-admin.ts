@@ -23,7 +23,7 @@ if (!admin.apps.length) {
   }
 }
 
-// Safely export auth instance, preventing import-time crashes on missing environments
+// Safely export auth and firestore instances, preventing import-time crashes on missing environments
 export const adminAuth = (() => {
   try {
     return admin.auth()
@@ -34,5 +34,18 @@ export const adminAuth = (() => {
         throw new Error("Firebase Admin SDK is not properly configured. Check your environment variables.")
       }
     } as unknown as admin.auth.Auth
+  }
+})()
+
+export const adminDb = (() => {
+  try {
+    return admin.firestore()
+  } catch (error) {
+    console.error("[Firebase Admin] Failed to retrieve Firestore service instance:", error)
+    return {
+      collection: () => {
+        throw new Error("Firebase Admin SDK is not properly configured. Check your environment variables.")
+      }
+    } as unknown as admin.firestore.Firestore
   }
 })()

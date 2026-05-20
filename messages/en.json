@@ -12,6 +12,8 @@
   },
   "NavUser": {
     "upgrade": "Upgrade to Pro",
+    "credits": "Credits: {count}",
+    "creditsTooltip": "{count} characters left",
     "account": "Account",
     "theme": "Theme",
     "themeLight": "Light",
@@ -228,6 +230,18 @@
     "loginSuccessToast": "Welcome back! You have logged in successfully.",
     "signUpSuccessToast": "Your account has been created successfully!",
     "logoutSuccessToast": "You have been logged out successfully."
+  },
+  "Billing": {
+    "title": "Top Up Credits",
+    "description": "Buy more characters to continue generating high-quality speech.",
+    "amountLabel": "Character Amount",
+    "amountPlaceholder": "Enter amount (min 100,000)",
+    "submit": "Buy",
+    "totalLabel": "Total Price",
+    "processing": "Processing...",
+    "success": "Successfully added {amount} characters!",
+    "error": "Failed to process top up. Please try again.",
+    "minError": "Minimum top up is 100,000 characters."
   },
   "EmptyState": {
     "title": "No Projects Yet",

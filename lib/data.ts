@@ -1,3 +1,10 @@
+export const CREDIT_CONSTANTS = {
+  INITIAL_BALANCE: 5000,
+  CREDITS_PER_CHARACTER: 1,
+  COMPACT_THRESHOLD: 10000,
+  PRICE_PER_CREDIT: 0.1, // Example: Rp 10.000 for 100.000 credits
+}
+
 export const projects = [
   {
     id: "project-alpha",
