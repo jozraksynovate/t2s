@@ -44,6 +44,7 @@
     "close": "Tutup",
     "cancel": "Batal",
     "saveChanges": "Simpan perubahan",
+    "saving": "Menyimpan...",
     "renameTitle": "Ubah Rincian Proyek",
     "renameDescription": "Ubah rincian proyek Anda di sini. Klik simpan setelah selesai.",
     "nameLabel": "Nama proyek",
@@ -53,8 +54,11 @@
     "deleteDescription": "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus proyek \"{name}\" secara permanen.",
     "deleteCancel": "Batal",
     "deleteConfirm": "Hapus Proyek",
+    "deleting": "Menghapus...",
     "deleteSuccess": "Proyek \"{name}\" berhasil dihapus",
-    "undo": "Urungkan"
+    "deleteError": "Gagal menghapus proyek",
+    "undo": "Urungkan",
+    "noDescription": "Tidak ada deskripsi"
   },
   "NewProject": {
     "trigger": "Proyek Baru",
@@ -63,7 +67,10 @@
     "nameLabel": "Nama proyek",
     "namePlaceholder": "Proyek Keren Saya",
     "create": "Buat Proyek",
-    "success": "Proyek \"{name}\" berhasil dibuat"
+    "creating": "Membuat...",
+    "success": "Proyek \"{name}\" berhasil dibuat",
+    "createError": "Gagal membuat proyek. Silakan coba lagi.",
+    "unauthorizedError": "Anda harus masuk terlebih dahulu untuk membuat proyek."
   },
   "CommandMenu": {
     "navigation": "Navigasi",
@@ -221,5 +228,12 @@
     "loginSuccessToast": "Selamat datang kembali! Anda berhasil masuk.",
     "signUpSuccessToast": "Akun Anda berhasil dibuat!",
     "logoutSuccessToast": "Anda telah berhasil keluar dari sistem."
+  },
+  "EmptyState": {
+    "title": "Belum Ada Proyek",
+    "description": "Anda belum membuat proyek apa pun. Mulailah dengan membuat proyek pertama Anda.",
+    "createButton": "Buat Proyek",
+    "importButton": "Impor Proyek",
+    "learnMore": "Pelajari Selengkapnya"
   }
 }

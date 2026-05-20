@@ -1,6 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { ProjectItem } from '@/components/project-item';
-import { projects } from '@/lib/data';
+import { ProjectList } from '@/components/project-list';
 
 export async function generateMetadata({
   params
@@ -24,16 +23,8 @@ export default async function StudioPage({
   setRequestLocale(locale);
 
   return (
-    <div className="p-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {projects.map((project) => (
-          <ProjectItem 
-            key={project.id}
-            title={project.title} 
-            description={project.description} 
-          />
-        ))}
-      </div>
+    <div className="flex flex-1 flex-col overflow-y-auto p-4">
+      <ProjectList />
     </div>
   )
 }

@@ -7,8 +7,12 @@ import * as z from "zod"
 import { useTranslations } from "next-intl"
 
 import { useRouter } from "@/i18n/routing"
+import { useAuth } from "@/hooks/use-auth"
+import { createProject } from "@/lib/firestore-service"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
 import {
   Dialog,
   DialogClose,
@@ -43,6 +47,8 @@ export function NewProjectDialog({
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen
   const setOpen = controlledOnOpenChange !== undefined ? controlledOnOpenChange : setInternalOpen
   
+  const [isPending, setIsPending] = React.useState(false)
+  const { user } = useAuth()
   const router = useRouter()
   const t = useTranslations('NewProject')
   const tCommon = useTranslations('ProjectItem')
@@ -63,11 +69,25 @@ export function NewProjectDialog({
     return () => window.removeEventListener("open-new-project", handleOpen)
   }, [setOpen])
 
-  const onSubmit = (values: ProjectFormValues) => {
-    setOpen(false)
-    const slug = values.name.toLowerCase().trim().replace(/\s+/g, '-')
-    router.push(`/app/studio/${slug}?name=${encodeURIComponent(values.name)}`)
-    form.reset()
+  const onSubmit = async (values: ProjectFormValues) => {
+    if (!user) {
+      toast.error(t('unauthorizedError'))
+      return
+    }
+
+    setIsPending(true)
+    try {
+      const projectId = await createProject(user.uid, values.name)
+      setOpen(false)
+      form.reset()
+      toast.success(t('success', { name: values.name }))
+      router.push(`/app/studio/${projectId}`)
+    } catch (error) {
+      console.error("Error creating project:", error)
+      toast.error(t('createError'))
+    } finally {
+      setIsPending(false)
+    }
   }
 
   return (
@@ -93,6 +113,7 @@ export function NewProjectDialog({
                 {...form.register("name")}
                 aria-invalid={!!form.formState.errors.name}
                 placeholder={t('namePlaceholder')}
+                disabled={isPending}
                 autoFocus
               />
               {form.formState.errors.name && (
@@ -102,12 +123,13 @@ export function NewProjectDialog({
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isPending}>
                 {tCommon('cancel')}
               </Button>
             </DialogClose>
-            <Button type="submit">
-              {t('create')}
+            <Button type="submit" disabled={isPending}>
+              {isPending && <Spinner />}
+              {isPending ? t('creating') : t('create')}
             </Button>
           </DialogFooter>
         </form>

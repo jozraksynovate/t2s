@@ -81,15 +81,13 @@ export function SignupForm({
   })
 
   const passwordValue = form.watch("password") || ""
-  const checks = React.useMemo(() => {
-    return {
-      minLength: passwordValue.length >= 8,
-      hasUppercase: /[A-Z]/.test(passwordValue),
-      hasLowercase: /[a-z]/.test(passwordValue),
-      hasNumber: /[0-9]/.test(passwordValue),
-      hasSpecial: /[^A-Za-z0-9]/.test(passwordValue),
-    }
-  }, [passwordValue])
+  const checks = {
+    minLength: passwordValue.length >= 8,
+    hasUppercase: /[A-Z]/.test(passwordValue),
+    hasLowercase: /[a-z]/.test(passwordValue),
+    hasNumber: /[0-9]/.test(passwordValue),
+    hasSpecial: /[^A-Za-z0-9]/.test(passwordValue),
+  }
 
   const getPasswordHint = () => {
     if (!passwordValue) {

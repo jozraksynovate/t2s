@@ -44,6 +44,7 @@
     "close": "Close",
     "cancel": "Cancel",
     "saveChanges": "Save changes",
+    "saving": "Saving...",
     "renameTitle": "Rename Project",
     "renameDescription": "Make changes to your project details here. Click save when you're done.",
     "nameLabel": "Project name",
@@ -53,8 +54,11 @@
     "deleteDescription": "This action cannot be undone. This will permanently delete the project \"{name}\".",
     "deleteCancel": "Cancel",
     "deleteConfirm": "Delete Project",
+    "deleting": "Deleting...",
     "deleteSuccess": "Project \"{name}\" deleted",
-    "undo": "Undo"
+    "deleteError": "Failed to delete project",
+    "undo": "Undo",
+    "noDescription": "No description"
   },
   "NewProject": {
     "trigger": "New Project",
@@ -63,7 +67,10 @@
     "nameLabel": "Project name",
     "namePlaceholder": "My Awesome Project",
     "create": "Create Project",
-    "success": "Project \"{name}\" created"
+    "creating": "Creating...",
+    "success": "Project \"{name}\" created",
+    "createError": "Failed to create project. Please try again.",
+    "unauthorizedError": "You must be logged in to create a project."
   },
   "CommandMenu": {
     "navigation": "Navigation",
@@ -221,5 +228,12 @@
     "loginSuccessToast": "Welcome back! You have logged in successfully.",
     "signUpSuccessToast": "Your account has been created successfully!",
     "logoutSuccessToast": "You have been logged out successfully."
+  },
+  "EmptyState": {
+    "title": "No Projects Yet",
+    "description": "You haven't created any projects yet. Get started by creating your first project.",
+    "createButton": "Create Project",
+    "importButton": "Import Project",
+    "learnMore": "Learn More"
   }
 }

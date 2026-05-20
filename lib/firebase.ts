@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app"
 import { getAuth, GoogleAuthProvider } from "firebase/auth"
+import { getFirestore } from "firebase/firestore"
 
 const rawApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY
 const rawProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
@@ -13,7 +14,7 @@ const firebaseConfig = {
   projectId: rawProjectId || "mock-project-id",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "mock-project.firebasestorage.app",
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "1234567890",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:1234567890:web:mockapphash",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:817164022237:web:2120e7ff96464137a98634",
 }
 
 // Cek kunci kosong hanya saat runtime di browser untuk membimbing developer
@@ -25,7 +26,7 @@ const missingClientKeys = Object.entries({
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 })
-  .filter(([_, value]) => !value)
+  .filter(([, value]) => !value)
   .map(([key]) => key)
 
 if (missingClientKeys.length > 0 && !isBuildTime) {
@@ -60,7 +61,7 @@ export const auth = (() => {
     // Mengembalikan objek Auth mock agar proses kompilasi Next.js tidak crash
     return {
       currentUser: null,
-      onAuthStateChanged: (callback: any) => {
+      onAuthStateChanged: () => {
         // Mengembalikan fungsi unsubscribe dummy
         return () => {}
       },
@@ -69,3 +70,15 @@ export const auth = (() => {
 })()
 
 export const googleProvider = new GoogleAuthProvider()
+
+// Menginisialisasi Firestore DB
+export const db = (() => {
+  try {
+    return getFirestore(app)
+  } catch (error) {
+    if (typeof window !== "undefined") {
+      console.error("[Firebase Client] Failed to retrieve Firestore DB instance:", error)
+    }
+    return {} as unknown as ReturnType<typeof getFirestore>
+  }
+})()

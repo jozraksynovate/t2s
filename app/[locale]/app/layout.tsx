@@ -27,18 +27,18 @@ export default async function AppLayout({
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false"
 
   return (
-    <AuthGuard>
-      <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar />
-        <SidebarInset className="flex h-screen flex-col overflow-hidden">
-          <AppHeader />
-          <div className="flex flex-1 flex-col overflow-hidden">
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <AppSidebar />
+      <SidebarInset className="flex h-screen flex-col overflow-hidden">
+        <AppHeader />
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <AuthGuard>
             {children}
-          </div>
-        </SidebarInset>
-        <CommandMenu />
-        <NewProjectDialog showTrigger={false} />
-      </SidebarProvider>
-    </AuthGuard>
+          </AuthGuard>
+        </div>
+      </SidebarInset>
+      <CommandMenu />
+      <NewProjectDialog showTrigger={false} />
+    </SidebarProvider>
   )
 }

@@ -67,7 +67,7 @@ export function StudioControls({
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [onPlayPauseToggle, onGenerate, isGenerating, hasAudio])
+  }, [onPlayPauseToggle, onGenerate, isGenerating, hasAudio, isGenerateDisabled])
 
   const isMac = typeof window !== "undefined" && navigator.platform.toUpperCase().indexOf('MAC') >= 0
 

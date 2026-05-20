@@ -35,6 +35,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Field, FieldGroup, FieldError, FieldLabel } from "@/components/ui/field"
+import { Spinner } from "@/components/ui/spinner"
 
 import {
   AlertDialog,
@@ -47,7 +48,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
+import { useAuth } from "@/hooks/use-auth"
+import { updateProject, deleteProject } from "@/lib/firestore-service"
+
 interface ProjectItemProps {
+  id: string
   title: string
   description: string
 }
@@ -58,13 +63,16 @@ const renameSchema = z.object({
 
 type RenameFormValues = z.infer<typeof renameSchema>
 
-export function ProjectItem({ title, description }: ProjectItemProps) {
+export function ProjectItem({ id, title, description }: ProjectItemProps) {
   const [open, setOpen] = React.useState(false)
   const [renameOpen, setRenameOpen] = React.useState(false)
   const [deleteOpen, setDeleteOpen] = React.useState(false)
   const [menuOpen, setMenuOpen] = React.useState(false)
+  const [isRenaming, setIsRenaming] = React.useState(false)
+  const [isDeleting, setIsDeleting] = React.useState(false)
+  const { user } = useAuth()
   const t = useTranslations('ProjectItem')
-  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/app/studio/linkproject` : ''
+  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/app/studio/${id}` : ''
 
   const form = useForm<RenameFormValues>({
     resolver: zodResolver(renameSchema),
@@ -72,6 +80,11 @@ export function ProjectItem({ title, description }: ProjectItemProps) {
       name: title,
     },
   })
+
+  // Keep form default value synced when title changes from external updates
+  React.useEffect(() => {
+    form.reset({ name: title })
+  }, [title, form])
 
   const handleCopy = (e?: React.MouseEvent | React.TouchEvent) => {
     if (e) {
@@ -113,37 +126,45 @@ export function ProjectItem({ title, description }: ProjectItemProps) {
     }
   }
 
-  const onRenameSubmit = (values: RenameFormValues) => {
-    setRenameOpen(false)
-    toast.success(t('renameSuccess', { name: values.name }), {
-      action: {
-        label: t('undo'),
-        onClick: () => console.log("Undo rename"),
-      },
-    })
+  const onRenameSubmit = async (values: RenameFormValues) => {
+    if (!user) return
+    setIsRenaming(true)
+    try {
+      await updateProject(id, user.uid, { title: values.name })
+      setRenameOpen(false)
+      toast.success(t('renameSuccess', { name: values.name }))
+    } catch (err) {
+      console.error("Error renaming project:", err)
+      toast.error(t('renameError') || "Failed to rename project")
+    } finally {
+      setIsRenaming(false)
+    }
   }
 
-  const onDeleteConfirm = () => {
-    setDeleteOpen(false)
-    toast.success(t('deleteSuccess', { name: title }), {
-      action: {
-        label: t('undo'),
-        onClick: () => console.log("Undo delete"),
-      },
-    })
+  const onDeleteConfirm = async () => {
+    if (!user) return
+    setIsDeleting(true)
+    try {
+      await deleteProject(id, user.uid)
+      setDeleteOpen(false)
+      toast.success(t('deleteSuccess', { name: title }))
+    } catch (err) {
+      console.error("Error deleting project:", err)
+      toast.error(t('deleteError') || "Failed to delete project")
+    } finally {
+      setIsDeleting(false)
+    }
   }
-
-  const projectSlug = title.toLowerCase().trim().replace(/\s+/g, '-')
 
   return (
     <>
-      <Item variant="outline" asChild>
-        <Link href={`/app/studio/${projectSlug}`}>
-          <ItemContent>
-            <ItemTitle className="line-clamp-1">{title}</ItemTitle>
-            <ItemDescription className="line-clamp-1">{description}</ItemDescription>
+      <Item variant="outline" className="flex-nowrap" asChild>
+        <Link href={`/app/studio/${id}`}>
+          <ItemContent className="min-w-0 flex-1">
+            <ItemTitle className="line-clamp-1 truncate block w-full">{title}</ItemTitle>
+            <ItemDescription className="line-clamp-1 truncate block w-full">{description || t('noDescription')}</ItemDescription>
           </ItemContent>
-          <ItemActions>
+          <ItemActions className="shrink-0">
             <DropdownMenu onOpenChange={setMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -254,12 +275,13 @@ export function ProjectItem({ title, description }: ProjectItemProps) {
             </FieldGroup>
             <DialogFooter>
               <DialogClose asChild>
-                <Button type="button" variant="outline">
+                <Button type="button" variant="outline" disabled={isRenaming}>
                   {t('cancel')}
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={!form.formState.isDirty}>
-                {t('saveChanges')}
+              <Button type="submit" disabled={isRenaming || !form.formState.isDirty}>
+                {isRenaming && <Spinner />}
+                {isRenaming ? t('saving') : t('saveChanges')}
               </Button>
             </DialogFooter>
           </form>
@@ -275,17 +297,24 @@ export function ProjectItem({ title, description }: ProjectItemProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
+            <AlertDialogCancel 
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+              disabled={isDeleting}
+            >
               {t('deleteCancel')}
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={(e) => {
                 e.stopPropagation()
+                if (isDeleting) return
                 onDeleteConfirm()
               }}
               variant="destructive"
             >
-              {t('deleteConfirm')}
+              {isDeleting && <Spinner />}
+              {isDeleting ? t('deleting') : t('deleteConfirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

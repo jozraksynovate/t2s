@@ -49,10 +49,8 @@ interface StudioSettingsProps {
 export function StudioSettings({
   mode,
   speakers: allSpeakers,
-  onUpdateSpeaker,
   globalConfig,
   onUpdateGlobalConfig,
-  activeSpeakerId,
   onConfigureSpeaker
 }: StudioSettingsProps) {
   const t = useTranslations("Studio")

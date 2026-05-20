@@ -11,7 +11,8 @@ import {
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useRouter } from "@/i18n/routing"
-import { projects } from "@/lib/data"
+import { useAuth } from "@/hooks/use-auth"
+import { getUserProjects, type Project } from "@/lib/firestore-service"
 
 import {
   CommandDialog,
@@ -25,9 +26,26 @@ import {
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false)
+  const [projects, setProjects] = React.useState<Project[]>([])
   const t = useTranslations("CommandMenu")
   const tNav = useTranslations("Navigation")
   const router = useRouter()
+  const { user } = useAuth()
+
+  React.useEffect(() => {
+    if (!user) {
+      const timer = setTimeout(() => {
+        setProjects([])
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+
+    const unsubscribe = getUserProjects(user.uid, (data) => {
+      setProjects(data)
+    })
+
+    return () => unsubscribe()
+  }, [user])
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -96,7 +114,7 @@ export function CommandMenu() {
           {projects.map((project) => (
             <CommandItem 
               key={project.id}
-              onSelect={() => runCommand(() => router.push(`/app/studio/${project.id}?name=${encodeURIComponent(project.title)}`))}
+              onSelect={() => runCommand(() => router.push(`/app/studio/${project.id}`))}
             >
               <FolderOpen />
               <span>{project.title}</span>

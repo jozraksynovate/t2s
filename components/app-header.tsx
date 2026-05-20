@@ -31,6 +31,20 @@ export function AppHeader() {
   const tStudio = useTranslations('Studio')
   const searchParams = useSearchParams()
   const projectNameParam = searchParams.get('name')
+  const [dynamicProjectName, setDynamicProjectName] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    const handleProjectLoaded = (e: Event) => {
+      const customEvent = e as CustomEvent<{ title: string }>;
+      if (customEvent.detail?.title) {
+        setDynamicProjectName(customEvent.detail.title);
+      }
+    };
+    window.addEventListener("project-loaded", handleProjectLoaded);
+    return () => {
+      window.removeEventListener("project-loaded", handleProjectLoaded);
+    };
+  }, []);
   
   // With next-intl's usePathname, the locale is already stripped.
   // Example: /app/studio (even if the URL is /en/app/studio)
@@ -77,7 +91,7 @@ export function AppHeader() {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  {projectNameParam || pathSegments[2]
+                  {dynamicProjectName || projectNameParam || pathSegments[2]
                     .split('-')
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(' ')}

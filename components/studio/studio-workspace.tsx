@@ -5,6 +5,10 @@ import { useTranslations } from "next-intl"
 import { Settings, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/use-auth"
+import { useParams } from "next/navigation"
+import { getProject, updateProject } from "@/lib/firestore-service"
+import { projects as mockProjects } from "@/lib/data"
+import { Spinner } from "@/components/ui/spinner"
 import { StudioEditor } from "./studio-editor"
 import { StudioComposer } from "./studio-composer"
 import { StudioControls } from "./studio-controls"
@@ -31,7 +35,10 @@ export function StudioWorkspace({
   defaultSettingsOpen?: boolean
 }) {
   const t = useTranslations("Studio")
-  const { getFreshToken } = useAuth()
+  const { getFreshToken, user } = useAuth()
+  const params = useParams()
+  const projectId = params?.id as string
+
   const [activeTab, setActiveTab] = useState("text")
   const [activeSpeakerId, setActiveSpeakerId] = useState<number | null>(null)
   const [speakers, setSpeakers] = useState<Speaker[]>(DEFAULT_SPEAKERS)
@@ -51,6 +58,12 @@ export function StudioWorkspace({
   const [isSettingsOpen, setIsSettingsOpen] = useState(defaultSettingsOpen)
   const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false)
 
+  // Cloud Firestore Persistence States
+  const [loadingProject, setLoadingProject] = useState(true)
+  const hasLoaded = useRef(false)
+  const isDirtyRef = useRef(false)
+  const lastSavedJsonRef = useRef<string>("")
+
   // Audio Generation & Playback States
   const [singleText, setSingleText] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
@@ -61,6 +74,141 @@ export function StudioWorkspace({
   const [progress, setProgress] = useState(0)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  // Helper to compile blocks list to single text representation
+  const compileBlocksToText = (blocksList: SpeechBlock[], currentSpeakers: Speaker[]) => {
+    if (blocksList.length === 1 && !blocksList[0].text.trim()) {
+      return ""
+    }
+    return blocksList
+      .map(b => {
+        const sp = currentSpeakers.find(s => s.id === b.speakerId)
+        const name = sp ? sp.name : `Speaker ${b.speakerId}`
+        return `${name}: ${b.text}`
+      })
+      .join("\n")
+  }
+
+  // 1. Fetch project from Firestore or fallback to mock data
+  useEffect(() => {
+    if (!user || !projectId) return
+
+    let active = true
+    const fetchProject = async () => {
+      try {
+        setLoadingProject(true)
+        const data = await getProject(projectId, user.uid)
+
+        if (!active) return
+
+        if (data) {
+          if (data.title) {
+            document.title = `${data.title} | T2S`;
+            window.dispatchEvent(new CustomEvent("project-loaded", { detail: { title: data.title } }));
+          }
+          if (data.speakers) setSpeakers(data.speakers)
+          if (data.globalConfig) setGlobalConfig(data.globalConfig)
+          if (data.blocks) {
+            setBlocks(data.blocks)
+            const compiled = compileBlocksToText(data.blocks, data.speakers || DEFAULT_SPEAKERS)
+            setSingleText(compiled)
+          }
+          // Initialize lastSavedJsonRef to match loaded state
+          lastSavedJsonRef.current = JSON.stringify({
+            speakers: data.speakers || [],
+            blocks: data.blocks || [],
+            globalConfig: data.globalConfig || { scene: "", sampleContext: "" }
+          })
+        } else {
+          // Fallback to static mock projects if not found in Firestore
+          const mockProj = mockProjects.find(p => p.id === projectId)
+          if (mockProj) {
+            setSpeakers(DEFAULT_SPEAKERS)
+            setBlocks([{ id: generateUUID(), speakerId: 1, text: mockProj.description }])
+            setSingleText(`Speaker 1: ${mockProj.description}`)
+            document.title = `${mockProj.title} | T2S`;
+            window.dispatchEvent(new CustomEvent("project-loaded", { detail: { title: mockProj.title } }));
+          }
+        }
+        hasLoaded.current = true
+      } catch (err) {
+        console.error("Failed to load project from Firestore:", err)
+        toast.error("Gagal memuat proyek dari cloud.")
+      } finally {
+        if (active) {
+          setLoadingProject(false)
+        }
+      }
+    }
+
+    fetchProject()
+
+    return () => {
+      active = false
+    }
+  }, [user, projectId])
+
+  // 2. Debounced Autosave to Firestore with warning on close and instant save on page change
+  useEffect(() => {
+    if (!hasLoaded.current || !user || !projectId || projectId.startsWith("project-")) return
+
+    // Deep check to prevent redundant saves if contents haven't actually changed
+    const currentJson = JSON.stringify({ speakers, blocks, globalConfig })
+    if (currentJson === lastSavedJsonRef.current) {
+      isDirtyRef.current = false
+      return
+    }
+
+    // Mark as dirty since actual data changed
+    isDirtyRef.current = true
+
+    const saveChanges = async () => {
+      try {
+        await updateProject(projectId, user.uid, {
+          speakers,
+          blocks,
+          globalConfig,
+        })
+        lastSavedJsonRef.current = currentJson
+        isDirtyRef.current = false
+      } catch (err) {
+        console.error("Failed to autosave project to Firestore:", err)
+      }
+    }
+
+    const delayDebounceFn = setTimeout(saveChanges, 1000) // 1 second debounce for incredibly fast response
+
+    return () => {
+      clearTimeout(delayDebounceFn)
+      // Save immediately on page change / unmount if there are unsaved changes
+      if (isDirtyRef.current) {
+        updateProject(projectId, user.uid, {
+          speakers,
+          blocks,
+          globalConfig,
+        }).then(() => {
+          lastSavedJsonRef.current = currentJson
+          isDirtyRef.current = false
+        }).catch((err) => {
+          console.error("Failed to save changes during cleanup:", err)
+        })
+      }
+    }
+  }, [speakers, blocks, globalConfig, user, projectId])
+
+  // Warn user on browser close/reload if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirtyRef.current) {
+        e.preventDefault()
+        e.returnValue = "" // Standard browser prompt
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [])
 
   // Automatically clean up object URLs to prevent browser memory leaks
   useEffect(() => {
@@ -123,20 +271,6 @@ export function StudioWorkspace({
     document.cookie = `studio_settings_open=${open}; path=/; max-age=${60 * 60 * 24 * 7}; path=/`
   }
 
-  // Helper to compile blocks list to single text representation
-  const compileBlocksToText = (blocksList: SpeechBlock[], currentSpeakers: Speaker[]) => {
-    if (blocksList.length === 1 && !blocksList[0].text.trim()) {
-      return ""
-    }
-    return blocksList
-      .map(b => {
-        const sp = currentSpeakers.find(s => s.id === b.speakerId)
-        const name = sp ? sp.name : `Speaker ${b.speakerId}`
-        return `${name}: ${b.text}`
-      })
-      .join("\n")
-  }
-
   const updateSpeaker = (id: number, updates: Partial<Speaker>) => {
     setSpeakers(prev => {
       const updated = prev.map(s => s.id === id ? { ...s, ...updates } : s)
@@ -195,7 +329,7 @@ export function StudioWorkspace({
       if (line.trim() === "") {
         continue
       }
-      
+
       // Match "SpeakerName: Text" or custom names (case-insensitive)
       const matchedSpeaker = speakers.find(sp => {
         const escapedName = sp.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
@@ -234,7 +368,7 @@ export function StudioWorkspace({
     // Filter out blocks that are completely empty if there are multiple,
     // but ensure we keep at least one block.
     const filteredBlocks = newBlocks.filter(b => b.text.trim().length > 0 || newBlocks.length === 1)
-    
+
     if (filteredBlocks.length > 0) {
       setBlocks(filteredBlocks)
     } else {
@@ -312,20 +446,20 @@ export function StudioWorkspace({
           try {
             const errorData = await response.json()
             errorMessage = errorData.message || errorMessage
-          } catch {}
+          } catch { }
         } else {
           try {
             const textError = await response.text()
             if (textError && textError.length < 150) {
               errorMessage = textError
             }
-          } catch {}
+          } catch { }
         }
         throw new Error(errorMessage)
       }
 
       const blob = await response.blob()
-      
+
       if (audioUrl) {
         URL.revokeObjectURL(audioUrl)
       }
@@ -432,6 +566,14 @@ export function StudioWorkspace({
   const isGenerateDisabled = activeTab === "text"
     ? !singleText.trim()
     : !blocks.some(b => b.text.trim().length > 0)
+
+  if (loadingProject) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-background animate-in fade-in duration-300">
+        <Spinner className="h-8 w-8 text-muted-foreground" />
+      </div>
+    )
+  }
 
   return (
     <main className="flex flex-1 overflow-hidden h-full w-full">
@@ -549,9 +691,8 @@ export function StudioWorkspace({
       </section>
 
       <aside
-        className={`hidden md:block h-full shrink-0 border-l bg-background overflow-hidden transition-[width,border-color] duration-200 ease-linear ${
-          isSettingsOpen ? "w-80 border-border" : "w-0 border-transparent"
-        }`}
+        className={`hidden md:block h-full shrink-0 border-l bg-background overflow-hidden transition-[width,border-color] duration-200 ease-linear ${isSettingsOpen ? "w-80 border-border" : "w-0 border-transparent"
+          }`}
       >
         <div ref={settingsScrollRef} className="w-80 p-4 h-full overflow-y-auto">
           <StudioSettings
